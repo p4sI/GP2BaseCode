@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{FA12C949-DEC2-4EB6-ABDE-AC3811C680FA}</ProjectGuid>
+    <ProjectGuid>{8CF15EFE-6B7A-49AE-9437-93C2056FF490}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Renderer</RootNamespace>
+    <RootNamespace>D3D10Renderer</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
