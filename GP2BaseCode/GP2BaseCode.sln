@@ -10,6 +10,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab1", "Lab1\Lab1.vcxproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameApplication", "GameApplication\GameApplication.vcxproj", "{9F6F576E-E40F-48D9-8111-570F4846B892}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Renderer", "Renderer\Renderer.vcxproj", "{FA12C949-DEC2-4EB6-ABDE-AC3811C680FA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "D3D10Renderer", "D3D10Renderer\D3D10Renderer.vcxproj", "{8CF15EFE-6B7A-49AE-9437-93C2056FF490}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -28,6 +32,14 @@ Global
 		{9F6F576E-E40F-48D9-8111-570F4846B892}.Debug|Win32.Build.0 = Debug|Win32
 		{9F6F576E-E40F-48D9-8111-570F4846B892}.Release|Win32.ActiveCfg = Release|Win32
 		{9F6F576E-E40F-48D9-8111-570F4846B892}.Release|Win32.Build.0 = Release|Win32
+		{FA12C949-DEC2-4EB6-ABDE-AC3811C680FA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FA12C949-DEC2-4EB6-ABDE-AC3811C680FA}.Debug|Win32.Build.0 = Debug|Win32
+		{FA12C949-DEC2-4EB6-ABDE-AC3811C680FA}.Release|Win32.ActiveCfg = Release|Win32
+		{FA12C949-DEC2-4EB6-ABDE-AC3811C680FA}.Release|Win32.Build.0 = Release|Win32
+		{8CF15EFE-6B7A-49AE-9437-93C2056FF490}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8CF15EFE-6B7A-49AE-9437-93C2056FF490}.Debug|Win32.Build.0 = Debug|Win32
+		{8CF15EFE-6B7A-49AE-9437-93C2056FF490}.Release|Win32.ActiveCfg = Release|Win32
+		{8CF15EFE-6B7A-49AE-9437-93C2056FF490}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
