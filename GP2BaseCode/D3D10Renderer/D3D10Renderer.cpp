@@ -68,7 +68,7 @@ bool D3D10Renderer::createDevice(HWND window, int windowWidth, int windowHeight,
 {
 	UINT createDeviceFlags = 0;
 #ifdef _DEBUG
-	createDeviceFlags|=D3D10_CREATE_DEVICE_DEBUG;
+	//createDeviceFlags|=D3D10_CREATE_DEVICE_DEBUG;
 #endif
 
 	/* DXGI_SWAP_CHAIN_DESC describes a swap chain

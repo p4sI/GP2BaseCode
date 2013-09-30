@@ -117,7 +117,7 @@ void CGameApplication::run()
 //Render, called to draw one frame of the game
 void CGameApplication::render()
 {
-	m_pRenderer->clear(1.0f, 0.0f, 0.0f, 1.0f);
+	m_pRenderer->clear(0.0f, 1.0f, 0.0f, 1.0f);
 	m_pRenderer->present();
 }
 
