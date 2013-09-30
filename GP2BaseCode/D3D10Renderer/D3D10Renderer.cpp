@@ -220,7 +220,7 @@ bool D3D10Renderer::createInitialRenderTarget(int windowWidth, int windowHeight)
 void D3D10Renderer::clear(float r, float g, float b, float a)
 {
 	const float ClearColor[4] = {r, g, b, a};
-	m_pD3D10Device->ClearRenderTClearDepthStencilViewargetView(m_pRenderTargetView, ClearColor);
+	m_pD3D10Device->ClearRenderTargetView(m_pRenderTargetView, ClearColor);
 	m_pD3D10Device->ClearDepthStencilView(m_pDepthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
 }
 
