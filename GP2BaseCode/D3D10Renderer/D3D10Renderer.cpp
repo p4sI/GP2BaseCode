@@ -8,7 +8,6 @@ struct Vertex
 	float x,y,z;
 };
 
-//http://www.gamedev.net/topic/506017-quick-question-about-id3d10inputlayout/
 // Define the input layout of the vertex, this is so we can bind a vertex to the pipeline - BMD
 const D3D10_INPUT_ELEMENT_DESC VerexLayout[] =
 {		
@@ -234,7 +233,11 @@ bool D3D10Renderer::loadEffectFromMemory(const char *pMem)
 
 bool D3D10Renderer::createBuffer()
 {
-	Vertex verts[]={{-1.0f,-1.0f,0.0f},{0.0f,1.0f,0.0f},{1.0f,-1.0f,0.0f}};
+	Vertex verts[]={
+		{-1.0f,-1.0f,0.0f},
+		{0.0f,1.0f,0.0f},
+		{1.0f,-1.0f,0.0f}
+	};
 	//Buffer desc
 	D3D10_BUFFER_DESC bd;
 	bd.Usage = D3D10_USAGE_DEFAULT;//Usuage flag,this describes how the buffer is read/written to. Default is the most common - BMD
@@ -256,7 +259,7 @@ bool D3D10Renderer::createBuffer()
 		&InitData, //Memory address of the initial data - BMD
 		&m_pTempBuffer )))//A pointer to a memory address of a buffer, this will be initialise after - BMD
 	{
-		OutputDebugStringA("Can't create vertex buffer");
+		OutputDebugStringA("Can't create buffer");
 	}
 	return true;
 }
@@ -317,7 +320,7 @@ void D3D10Renderer::render()
 
 	for (unsigned int i=0;i<techniqueDesc.Passes;++i)
 	{
-		ID3D10EffectPass *pCurrentPass=m_pTempTechnique->GetPassByIndex(0);
+		ID3D10EffectPass *pCurrentPass=m_pTempTechnique->GetPassByIndex(i);
 		pCurrentPass->Apply(0);
 		m_pD3D10Device->Draw(3,0);
 	}

@@ -10,6 +10,7 @@ struct IDXGISwapChain;
 struct ID3D10RenderTargetView;
 struct ID3D10DepthStencilView;
 struct ID3D10Texture2D;
+
 struct ID3D10Effect;
 struct ID3D10Buffer;
 struct ID3D10InputLayout;
