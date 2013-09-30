@@ -27,7 +27,7 @@ public:
 
 private:
 	bool createDevice(HWND pWindowHandle, int windowWidth, int windowHeight,
-			bool fullscreen);
+			bool fullScreen);
 	bool createInitialRenderTarget(int windowWidth, int windowHeight);
 private:
 	//D3D10 stuff
