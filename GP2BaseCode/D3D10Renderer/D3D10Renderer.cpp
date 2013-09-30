@@ -40,6 +40,13 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 {
 	HWND window = (HWND)pWindowHandle;
 	RECT windowRect;
+
+	/*
+	GetClientRect () Retrieves the coordinates of a window's client area. The client coordinates specify the 
+	upper-left and lower-right corners of the client area. Because client coordinates are relative to the 
+	upper-left corner of a window's client area, the coordinates of the upper-left corner are (0,0).
+	http://msdn.microsoft.com/en-us/library/windows/desktop/ms633503%28v=vs.85%29.aspx
+	*/
 	GetClientRect(window, &windowRect);
 
 	UINT width = windowRect.right - windowRect.left;
@@ -64,6 +71,9 @@ bool D3D10Renderer::createDevice(HWND window, int windowWidth, int windowHeight,
 	createDeviceFlags|=D3D10_CREATE_DEVICE_DEBUG;
 #endif
 
+	/* DXGI_SWAP_CHAIN_DESC describes a swap chain
+	http://msdn.microsoft.com/en-us/library/windows/desktop/bb173075%28v=vs.85%29.aspx
+	*/
 	DXGI_SWAP_CHAIN_DESC sd;
 	ZeroMemory(&sd, sizeof(sd));
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -82,6 +92,9 @@ bool D3D10Renderer::createDevice(HWND window, int windowWidth, int windowHeight,
 	sd.BufferDesc.RefreshRate.Numerator = 60;
 	sd.BufferDesc.RefreshRate.Denominator = 1;
 	
+	/* D3D10CreateDeviceAndSwapChain()
+	http://msdn.microsoft.com/en-us/library/windows/desktop/bb205087%28v=vs.85%29.aspx
+	*/
 	if (FAILED(D3D10CreateDeviceAndSwapChain(NULL, 
 					D3D10_DRIVER_TYPE_HARDWARE,
 					NULL,
@@ -108,8 +121,14 @@ bool D3D10Renderer::createDevice(HWND window, int windowWidth, int windowHeight,
 */
 bool D3D10Renderer::createInitialRenderTarget(int windowWidth, int windowHeight)
 {
+	/* ID3D10Texture2D: A 2D texture interface manages texel data, which is structured memory.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/bb173867%28v=vs.85%29.aspx
+	*/
 	ID3D10Texture2D *pBackBuffer;
 
+	/* GetBuffer() Accesses one of the swap-chain's back buffers.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/bb174570%28v=vs.85%29.aspx
+	*/
 	if (FAILED(m_pSwapChain->GetBuffer(0, 
 								__uuidof(ID3D10Texture2D), 
 								(void**)&pBackBuffer)))
@@ -128,16 +147,29 @@ bool D3D10Renderer::createInitialRenderTarget(int windowWidth, int windowHeight)
 	descDepth.CPUAccessFlags = 0;
 	descDepth.MiscFlags = 0;
 
+	/* CreateTexture2D creates an array of 2D textures.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/bb173560%28v=vs.85%29.aspx
+
+	descDepth is type of D3D10_TEXTURE2D_DESC: http://msdn.microsoft.com/en-us/library/windows/desktop/bb172480%28v=vs.85%29.aspx
+	*/
 	if (FAILED(m_pD3D10Device->CreateTexture2D(&descDepth, 
 									NULL, 
 									&m_pDepthStencilTexture)))
 		return false;
 
+	/* D3D10_DEPTH_STENCIL_VIEW_DESC 
+	Specifies the subresource(s) from a texture that are accessible using a depth-stencil view.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/bb205037%28v=vs.85%29.aspx
+	*/
 	D3D10_DEPTH_STENCIL_VIEW_DESC descDSV;
 	descDSV.Format = descDepth.Format;
 	descDSV.ViewDimension = D3D10_DSV_DIMENSION_TEXTURE2D;
 	descDSV.Texture2D.MipSlice = 0;
 
+	/*ID3D10Device::CreateDepthStencilView method
+	Create a depth-stencil view for accessing resource data.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/bb173547%28v=vs.85%29.aspx
+	*/
 	if (FAILED(m_pD3D10Device->CreateDepthStencilView(m_pDepthStencilTexture,
 									&descDSV, 
 									&m_pDepthStencilView)))
@@ -152,10 +184,18 @@ bool D3D10Renderer::createInitialRenderTarget(int windowWidth, int windowHeight)
 	}
 	pBackBuffer->Release();
 
+	/*ID3D10Device::OMSetRenderTargets method
+	Bind one or more render targets and the depth-stencil buffer to the output-merger stage.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/bb173597%28v=vs.85%29.aspx
+	*/
 	m_pD3D10Device->OMSetRenderTargets(1,
 		&m_pRenderTargetView,
 		m_pDepthStencilView);
 
+	/*D3D10_VIEWPORT structure
+	Defines the dimensions of a viewport.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/bb172500%28v=vs.85%29.aspx
+	*/
 	D3D10_VIEWPORT vp;
 	vp.Width = windowWidth;
 	vp.Height = windowHeight;
@@ -163,17 +203,24 @@ bool D3D10Renderer::createInitialRenderTarget(int windowWidth, int windowHeight)
 	vp.MaxDepth = 1.0f;
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
+
+	/*ID3D10Device::RSSetViewports method
+	Bind an array of viewports to the rasterizer stage of the pipeline.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/bb173613%28v=vs.85%29.aspx
+	*/
 	m_pD3D10Device->RSSetViewports(1, &vp);
 	return true;
 }
 
 /*
   This function simply clears all buffers (via the views)
+  ClearRenderTargetView: http://msdn.microsoft.com/en-us/library/windows/desktop/bb173539%28v=vs.85%29.aspx
+  ClearDepthStencilView: http://msdn.microsoft.com/en-us/library/windows/desktop/bb173538%28v=vs.85%29.aspx
 */
 void D3D10Renderer::clear(float r, float g, float b, float a)
 {
 	const float ClearColor[4] = {r, g, b, a};
-	m_pD3D10Device->ClearRenderTargetView(m_pRenderTargetView, ClearColor);
+	m_pD3D10Device->ClearRenderTClearDepthStencilViewargetView(m_pRenderTargetView, ClearColor);
 	m_pD3D10Device->ClearDepthStencilView(m_pDepthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
 }
 
