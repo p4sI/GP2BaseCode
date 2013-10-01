@@ -11,6 +11,10 @@ D3D10Renderer::D3D10Renderer()
 	m_pSwapChain = NULL;
 	m_pDepthStencilTexture = NULL;
 	m_pDepthStencilView = NULL;
+	m_pTempEffect = NULL;
+	m_pTempTechnique = NULL;
+	m_pTempBuffer = NULL;
+	m_pTempVertexLayout = NULL;
 }
 
 //Deconstructor (Releases each of the Direct3D10 interfaces)
@@ -56,6 +60,13 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 		return false;
 	if(!createInitialRenderTarget(width, height))
 		return false;
+	/*if(!loadEffectFromMemory(NULL)) // what input??
+		return false;
+	if(!createBuffer())
+		return false;
+	if(!createVertexLayout())
+		return false;
+	*/
 
 	return true;
 }
@@ -231,4 +242,9 @@ void D3D10Renderer::clear(float r, float g, float b, float a)
 void D3D10Renderer::present()
 {
 	m_pSwapChain->Present(0, 0);
+}
+
+void D3D10Renderer::render()
+{
+	
 }
