@@ -9,6 +9,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab1", "Lab1\Lab1.vcxproj",
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameApplication", "GameApplication\GameApplication.vcxproj", "{9F6F576E-E40F-48D9-8111-570F4846B892}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FA12C949-DEC2-4EB6-ABDE-AC3811C680FA} = {FA12C949-DEC2-4EB6-ABDE-AC3811C680FA}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Renderer", "Renderer\Renderer.vcxproj", "{FA12C949-DEC2-4EB6-ABDE-AC3811C680FA}"
 EndProject

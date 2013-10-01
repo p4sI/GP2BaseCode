@@ -12,7 +12,7 @@ struct ID3D10DepthStencilView;
 struct ID3D10Texture2D;
 struct ID3D10Effect;
 struct ID3D10Buffer;
-struct ID3D10InputLayer;
+struct ID3D10InputLayout;
 struct ID3D10EffectTechnique;
 
 //D3D10Renderer implements the Renderer interface
@@ -45,7 +45,7 @@ private:
 	ID3D10DepthStencilView *m_pDepthStencilView;  //stencil or stencEl ?!?!
 	ID3D10Texture2D *m_pDepthStencilTexture;
 	ID3D10Effect *m_pTempEffect;
-	ID3D10Buffer *m_pTempTechnique;
-	ID3D10InputLayer *m_pTempBuffer;
-	ID3D10EffectTechnique *m_pTempVertexLayout;
+	ID3D10Buffer *m_pTempBuffer;
+	ID3D10InputLayout *m_pTempVertexLayout;
+	ID3D10EffectTechnique *m_pTempTechnique;
 };

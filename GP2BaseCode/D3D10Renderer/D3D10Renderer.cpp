@@ -3,6 +3,31 @@
 #include <D3D10.h>
 #include <D3DX10.h>
 
+struct Vertex
+{
+	float x,y,z;
+};
+
+const char basicEffect[] = \
+	"float4 VS( float4 Pos : POSITION ) : SV_POSITION"\		
+	"{"\
+	"	return Pos;"\
+	"}"\
+	"float4 PS( float4 Pos : SV_POSITION ) : SV_Target"\	
+	"}"\
+	"	return float4( 1.0f, 1.0f, 0.0f, 1.0f );"\
+	"}"\
+	"technique10 Render"\
+	"}"\
+	"	pass P0"\
+	"	{"\
+	"		SetVertexShader( CompileShader( vs_4_0, VS() ) );"\
+	"		SetGeometryShader( NULL );"\
+	"		SetPixelShader( CompileShader( ps_4_0, PS() ) ):"\
+	"	}"\
+	"}";
+
+
 // Constructor (sets every variables to NULL)
 D3D10Renderer::D3D10Renderer()
 {
@@ -22,7 +47,9 @@ D3D10Renderer::~D3D10Renderer()
 {
 	if(m_pD3D10Device)
 		m_pD3D10Device->ClearState();
-
+	
+	if(m_pTempBuffer)
+		m_pTempBuffer->Release();
 	if(m_pRenderTargetView)
 		m_pRenderTargetView->Release();
 	if(m_pDepthStencilView)
@@ -60,13 +87,13 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 		return false;
 	if(!createInitialRenderTarget(width, height))
 		return false;
-	/*if(!loadEffectFromMemory(NULL)) // what input??
+	if(!loadEffectFromMemory(NULL)) // what input??
 		return false;
 	if(!createBuffer())
 		return false;
 	if(!createVertexLayout())
 		return false;
-	*/
+	
 
 	return true;
 }
@@ -247,4 +274,47 @@ void D3D10Renderer::present()
 void D3D10Renderer::render()
 {
 	
+}
+
+bool D3D10Renderer::loadEffectFromMemory(const char* pMem)
+{
+	return true;
+}
+
+bool D3D10Renderer::createBuffer()
+{
+	Vertex verts[] = {
+		{-1.0f, -1.0f, 0.0f},
+		{ 0.0f,  1.0f, 0.0f},
+		{ 1.0f, -1.0f, 0.0f}
+	};
+	
+	// Defines the propertys of the buffer
+	D3D10_BUFFER_DESC bd;
+	bd.Usage = D3D10_USAGE_DEFAULT;
+	bd.ByteWidth = sizeof( Vertex ) * 3;	// buffer is big enough for 3 vertices
+	bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = 0;
+	bd.MiscFlags = 0;
+
+	// prepare the data to copy it into the buffer
+	D3D10_SUBRESOURCE_DATA InitData;
+	InitData.pSysMem = &verts;
+
+	//buffer creation
+	if (FAILED(m_pD3D10Device->CreateBuffer(
+			&bd,
+			&InitData,
+			&m_pTempBuffer )))
+	{
+		OutputDebugStringA("Cant create buffer");
+		
+	}
+
+	return true;
+}
+
+bool D3D10Renderer::createVertexLayout()
+{
+	return true;
 }
