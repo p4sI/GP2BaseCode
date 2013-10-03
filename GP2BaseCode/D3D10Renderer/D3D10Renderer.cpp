@@ -8,24 +8,25 @@ struct Vertex
 	float x,y,z;
 };
 
-const char basicEffect[] = \
-	"float4 VS( float4 Pos : POSITION ) : SV_POSITION"\		
+const char basicEffect[]=\
+	"float4 VS( float4 Pos : POSITION ) : SV_POSITION"\
 	"{"\
 	"	return Pos;"\
 	"}"\
-	"float4 PS( float4 Pos : SV_POSITION ) : SV_Target"\	
-	"}"\
+	"float4 PS( float4 Pos : SV_POSITION ) : SV_Target"\
+	"{"\
 	"	return float4( 1.0f, 1.0f, 0.0f, 1.0f );"\
 	"}"\
 	"technique10 Render"\
-	"}"\
+	"{"\
 	"	pass P0"\
 	"	{"\
 	"		SetVertexShader( CompileShader( vs_4_0, VS() ) );"\
 	"		SetGeometryShader( NULL );"\
-	"		SetPixelShader( CompileShader( ps_4_0, PS() ) ):"\
+	"		SetPixelShader( CompileShader( ps_4_0, PS() ) );"\
 	"	}"\
 	"}";
+
 
 
 // Constructor (sets every variables to NULL)
@@ -60,6 +61,8 @@ D3D10Renderer::~D3D10Renderer()
 		m_pSwapChain->Release();
 	if(m_pD3D10Device)
 		m_pD3D10Device->Release();
+	if(m_pTempEffect)
+		m_pTempEffect->Release();
 }
 
 /* 
@@ -87,11 +90,11 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 		return false;
 	if(!createInitialRenderTarget(width, height))
 		return false;
-	if(!loadEffectFromMemory(NULL)) // what input??
-		return false;
-	if(!createBuffer())
+	if(!loadEffectFromMemory(basicEffect)) // what input??
 		return false;
 	if(!createVertexLayout())
+		return false;
+	if(!createBuffer())
 		return false;
 	
 
@@ -106,7 +109,7 @@ bool D3D10Renderer::createDevice(HWND window, int windowWidth, int windowHeight,
 {
 	UINT createDeviceFlags = 0;
 #ifdef _DEBUG
-	//createDeviceFlags|=D3D10_CREATE_DEVICE_DEBUG;
+	createDeviceFlags|=D3D10_CREATE_DEVICE_DEBUG;
 #endif
 
 	/* DXGI_SWAP_CHAIN_DESC describes a swap chain
@@ -278,6 +281,34 @@ void D3D10Renderer::render()
 
 bool D3D10Renderer::loadEffectFromMemory(const char* pMem)
 {
+	DWORD dwShaderFlags = D3D10_SHADER_ENABLE_STRICTNESS;
+#if defined( DEBUG ) || defined( _DEBUG )
+	dwShaderFlags |= D3D10_SHADER_DEBUG;
+#endif
+
+	ID3D10Blob *pErrorBuffer = NULL;
+	if (FAILED(D3DX10CreateEffectFromMemory(
+		pMem,				// pointer to the memory which holds the effect
+		strlen(pMem),		// the size of the effect in memory
+		NULL,
+		NULL,
+		NULL,
+		"fx_4_0",			// effect profile which tells the compiler what shader model to target
+		dwShaderFlags,		// shader flags which may add extra information into the compiled effect including debugging information
+		0,
+		m_pD3D10Device,		// D3D10 Device
+		NULL, 
+		NULL, 
+		&m_pTempEffect,		// hold our Effect object
+		&pErrorBuffer,		// hold all error messages
+		NULL )))
+	{
+		OutputDebugStringA((char*)pErrorBuffer->GetBufferPointer());
+		return false;
+	}
+
+	m_pTempTechnique=m_pTempEffect->GetTechniqueByName("Render");	//  retrieve the technique by name.
+
 	return true;
 }
 
