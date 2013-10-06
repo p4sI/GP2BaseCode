@@ -8,6 +8,23 @@ struct Vertex
 	float x,y,z;
 };
 
+/* this defines the layout of a single vertex and includes the name of the 
+semantic(helps to bind the vertex elements to the vertex elements contained 
+in the effect, the format of the element(type and quantity) and the offset from 
+the start of the memory location where the element is located inside the vertex stream. 
+*/
+const D3D10_INPUT_ELEMENT_DESC VertexLayout[] =
+{		
+    { "POSITION",
+	0, 
+	DXGI_FORMAT_R32G32B32_FLOAT, 
+	0, 
+	0, 
+	D3D10_INPUT_PER_VERTEX_DATA, 
+	0 }, 
+};
+
+
 const char basicEffect[]=\
 	"float4 VS( float4 Pos : POSITION ) : SV_POSITION"\
 	"{"\
@@ -63,6 +80,8 @@ D3D10Renderer::~D3D10Renderer()
 		m_pD3D10Device->Release();
 	if(m_pTempEffect)
 		m_pTempEffect->Release();
+	if(m_pTempVertexLayout)
+		m_pTempVertexLayout->Release();
 }
 
 /* 
@@ -90,7 +109,7 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 		return false;
 	if(!createInitialRenderTarget(width, height))
 		return false;
-	if(!loadEffectFromMemory(basicEffect)) // what input??
+	if(!loadEffectFromMemory(basicEffect))
 		return false;
 	if(!createVertexLayout())
 		return false;
@@ -276,6 +295,36 @@ void D3D10Renderer::present()
 
 void D3D10Renderer::render()
 {
+	/* tell the pipeline what primitives it will draw and the input-layout of the vertices. 
+	Input-layout objects describe how vertex buffer data is streamed into the IA pipeline stage*/
+	m_pD3D10Device->IASetPrimitiveTopology(
+					D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	m_pD3D10Device->IASetInputLayout(m_pTempVertexLayout);
+
+    UINT stride = sizeof( Vertex );		// A stride is the size (in bytes) of the elements that are to be used from that vertex buffer.
+    UINT offset = 0;					// A offset is the number of bytes between the first element of a vertex buffer and the first element that will be used
+
+	/* IASetVertexBuffers(): Bind an array of vertex buffers to the input-assembler stage.
+	   http://msdn.microsoft.com/en-us/library/windows/desktop/bb173591%28v=vs.85%29.aspx 
+	*/
+    m_pD3D10Device->IASetVertexBuffers( 
+		0,					// The first input slot for binding.
+		1,					// The number of vertex buffers in the array. 
+		&m_pTempBuffer,		// A pointer to an array of vertex buffers
+		&stride,			// Pointer to an array of stride values; one stride value for each buffer in the vertex-buffer array
+		&offset );			// Pointer to an array of offset values; one offset value for each buffer in the vertex-buffer array
+
+	// to get information about the technique such as the number of passes
+	D3D10_TECHNIQUE_DESC techniqueDesc;
+	m_pTempTechnique->GetDesc(&techniqueDesc);
+
+	for (unsigned int i = 0; i < techniqueDesc.Passes; ++i)	// loop through all the passes in the technique
+	{
+		ID3D10EffectPass *pCurrentPass = m_pTempTechnique->GetPassByIndex(i);	// grab the pass
+		pCurrentPass->Apply(0);			// apply it(this ensures that the pipeline states and shaders are all bound to the pipeline) 
+		m_pD3D10Device->Draw(3,0);		// Draw(number of vertices, start location in the buffer)
+	}
+
 	
 }
 
@@ -322,24 +371,25 @@ bool D3D10Renderer::createBuffer()
 	
 	// Defines the propertys of the buffer
 	D3D10_BUFFER_DESC bd;
-	bd.Usage = D3D10_USAGE_DEFAULT;
+	bd.Usage = D3D10_USAGE_DEFAULT;			// Identify how the buffer is expected to be read from and written to
 	bd.ByteWidth = sizeof( Vertex ) * 3;	// buffer is big enough for 3 vertices
-	bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
-	bd.CPUAccessFlags = 0;
-	bd.MiscFlags = 0;
+	bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;// Identify how the buffer will be bound to the pipeline
+	bd.CPUAccessFlags = 0;					// CPU access flags ( 0 if no CPU access is necessary)
+	bd.MiscFlags = 0;						// Miscellaneous flags ( 0 if unused)
 
 	// prepare the data to copy it into the buffer
 	D3D10_SUBRESOURCE_DATA InitData;
 	InitData.pSysMem = &verts;
 
-	//buffer creation
+	/* CreateBufer(): Create a buffer (vertex buffer, index buffer, or shader-constant buffer).
+	   http://msdn.microsoft.com/en-us/library/windows/desktop/bb173544%28v=vs.85%29.aspx
+	*/
 	if (FAILED(m_pD3D10Device->CreateBuffer(
-			&bd,
-			&InitData,
-			&m_pTempBuffer )))
+			&bd,				// Pointer to a buffer description
+			&InitData,			// Pointer to the initialization data
+			&m_pTempBuffer )))	// Address of a pointer to the buffer created 
 	{
-		OutputDebugStringA("Cant create buffer");
-		
+		OutputDebugStringA("Cant create buffer");	
 	}
 
 	return true;
@@ -347,5 +397,27 @@ bool D3D10Renderer::createBuffer()
 
 bool D3D10Renderer::createVertexLayout()
 {
+	/* We have to retrieve the pass description from the technqiue as this is 
+	used to bind the vertex in our C++ code to the vertex in the 
+	effect (PassDesc.pIAInputSignature and PassDesc.IAInputSignatureSize).
+	*/
+	UINT numElements = sizeof( VertexLayout ) / sizeof(D3D10_INPUT_ELEMENT_DESC);
+    D3D10_PASS_DESC PassDesc;
+    m_pTempTechnique->GetPassByIndex( 0 )->GetDesc( &PassDesc );
+
+	/* createInputLayout(): Create an input-layout object to describe the input-buffer data for the input-assembler stage.
+	   http://msdn.microsoft.com/en-us/library/windows/desktop/bb173550%28v=vs.85%29.aspx 
+	*/
+    if (FAILED(m_pD3D10Device->CreateInputLayout( 
+		VertexLayout,					// An array of the input-assembler stage input data types
+		numElements,					// The number of input-data types in the array of input-elements.
+		PassDesc.pIAInputSignature,		// A pointer to the compiled shader.
+        PassDesc.IAInputSignatureSize,	// Size of the compiled shader.
+		&m_pTempVertexLayout )))		// A pointer to the input-layout object created
+	{
+		OutputDebugStringA("Can't create layout");
+	}
+
+	
 	return true;
 }
