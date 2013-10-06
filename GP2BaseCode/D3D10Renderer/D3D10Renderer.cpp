@@ -301,6 +301,7 @@ void D3D10Renderer::render()
 					D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	m_pD3D10Device->IASetInputLayout(m_pTempVertexLayout);
 
+
     UINT stride = sizeof( Vertex );		// A stride is the size (in bytes) of the elements that are to be used from that vertex buffer.
     UINT offset = 0;					// A offset is the number of bytes between the first element of a vertex buffer and the first element that will be used
 
@@ -363,11 +364,25 @@ bool D3D10Renderer::loadEffectFromMemory(const char* pMem)
 
 bool D3D10Renderer::createBuffer()
 {
-	Vertex verts[] = {
-		{-1.0f, -1.0f, 0.0f},
-		{ 0.0f,  1.0f, 0.0f},
-		{ 1.0f, -1.0f, 0.0f}
+	Vertex verts[] = {			// standart triangle
+		{-1.0f, -1.0f, 0.0f},	// lower left corner
+		{ 0.0f,  1.0f, 0.0f},	// mid of top
+		{ 1.0f, -1.0f, 0.0f}	// lower right corner
 	};
+
+	Vertex verts1[] = {			// right angled triangle
+		{ 0.0f, -1.0f, 0.0f},	// mid of bottom
+		{ 0.0f,  1.0f, 0.0f},	// mid of top
+		{ 1.0f, -1.0f, 0.0f}	// lower right corner
+	};
+
+	Vertex verts2[] = {			// square
+		{-1.0f,  1.0f, 0.0f},	// top left corner
+		{ 0.0f,  1.0f, 0.0f},	// mid of top
+		{ 0.0f, -1.0f, 0.0f},	// mid of bottom
+		{-1.0f, -1.0f, 0.0f}	// lower left corner
+	};
+
 	
 	// Defines the propertys of the buffer
 	D3D10_BUFFER_DESC bd;
