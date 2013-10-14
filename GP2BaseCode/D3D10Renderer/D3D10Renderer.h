@@ -2,13 +2,15 @@
 
 //The header file for the renderer interface
 #include "../Renderer/Renderer.h"
-#include <D3D10.h>
-#include <D3DX10.h>
+
 #include <Windows.h>
 
+#include <D3D10.h>
+#include <D3DX10.h>
 
+#define _XM_NO_INTRINSICS_
+#include <xnamath.h>
 
-//#include <xnamath.h>
 
 //D3D10Renderer implements the Renderer interface
 class D3D10Renderer:public IRenderer
@@ -32,6 +34,8 @@ bool fullScreen);
 	bool loadEffectFromFile(const char *pFilename);
 	bool createBuffer();
 	bool creatVertexLayout();
+	void createCamera(XMVECTOR &position, XMVECTOR &focu,XMVECTOR &up,float fov,float aspectRatio,float nearClip,float farClip);
+	void setSquarePosition(float x,float y,float z);
 private:
 	//D3D10 stuff
 	ID3D10Device * m_pD3D10Device;
@@ -52,8 +56,15 @@ private:
 	ID3D10InputLayout*      m_pTempVertexLayout;
 
 	//Variables for Camera
-	//XMMATRIX  m_World;
-	//XMMATRIX  m_View;
-	//XMMATRIX  m_Projection;
+	XMMATRIX  m_View;
+	XMMATRIX  m_Projection;
+
+	//For Object
+	XMMATRIX  m_World;
+
+	//Effect Variables
+	ID3D10EffectMatrixVariable * m_pWorldEffectVariable;
+	ID3D10EffectMatrixVariable * m_pProjectionEffectVariable;
+	ID3D10EffectMatrixVariable * m_pViewEffectVariable;
 
 };

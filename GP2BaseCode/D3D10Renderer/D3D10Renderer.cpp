@@ -1,5 +1,3 @@
-
-
 #include "D3D10Renderer.h"
 
 
@@ -99,8 +97,29 @@ bool D3D10Renderer::init(void *pWindowHandle,bool fullScreen)
 	if (!createBuffer())
 		return false;
 
+	XMFLOAT3 cameraPos=XMFLOAT3(0.0f,0.0f,-10.0f);
+	XMFLOAT3 focusPos=XMFLOAT3(0.0f,0.0f,0.0f);
+	XMFLOAT3 up=XMFLOAT3(0.0f,1.0f,0.0f);
 	//Calculate World View
+	createCamera(XMLoadFloat3(&cameraPos),XMLoadFloat3(&focusPos),XMLoadFloat3(&up),XM_PI/4,(float)width/(float)height,0.1f,100.0f);
+	setSquarePosition(0.0f,0.0f,0.0f);
 	return true;
+}
+
+void D3D10Renderer::createCamera(XMVECTOR &position, XMVECTOR &focus,XMVECTOR &up,float fov,float aspectRatio,float nearClip,float farClip)
+{
+	m_View=XMMatrixIdentity();
+	m_Projection=XMMatrixIdentity();
+
+	m_View=XMMatrixLookAtLH(position,focus,up);
+	m_Projection=XMMatrixPerspectiveFovLH(fov,aspectRatio,nearClip,farClip);
+}
+
+void D3D10Renderer::setSquarePosition(float x,float y,float z)
+{
+	m_World=XMMatrixIdentity();
+
+	m_World=XMMatrixTranslation(x,y,z);
 }
 
 bool D3D10Renderer::createDevice(HWND window,int windowWidth, int windowHeight,bool fullScreen)
@@ -265,6 +284,10 @@ bool D3D10Renderer::loadEffectFromFile(const char *pFilename)
 	}
 
 	m_pTempTechnique=m_pTempEffect->GetTechniqueByName("Render");
+
+	m_pWorldEffectVariable=m_pTempEffect->GetVariableByName("matWorld")->AsMatrix();
+	m_pProjectionEffectVariable=m_pTempEffect->GetVariableByName("matProjection")->AsMatrix();
+	m_pViewEffectVariable=m_pTempEffect->GetVariableByName("matView")->AsMatrix();
 	return true;
 }
 
@@ -334,6 +357,11 @@ void D3D10Renderer::clear(float r,float g,float b,float a)
 
 void D3D10Renderer::render()
 {
+	//Send variables
+	m_pWorldEffectVariable->SetMatrix((float*)&m_World);
+	m_pProjectionEffectVariable->SetMatrix((float*)&m_Projection);
+	m_pViewEffectVariable->SetMatrix((float*)&m_View);
+
 	//Set the type of primitive
 	m_pD3D10Device->IASetPrimitiveTopology( D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP );
 
