@@ -2,19 +2,13 @@
 
 //The header file for the renderer interface
 #include "../Renderer/Renderer.h"
+#include <D3D10.h>
+#include <D3DX10.h>
 #include <Windows.h>
 
-//forward declarations of the D3D10 interfaces
-struct ID3D10Device;
-struct IDXGISwapChain;
-struct ID3D10RenderTargetView;
-struct ID3D10DepthStencilView;
-struct ID3D10Texture2D;
 
-struct ID3D10Effect;
-struct ID3D10Buffer;
-struct ID3D10InputLayout;
-struct ID3D10EffectTechnique;
+
+//#include <xnamath.h>
 
 //D3D10Renderer implements the Renderer interface
 class D3D10Renderer:public IRenderer
@@ -35,6 +29,7 @@ bool fullScreen);
 
 	//temp for the exercise
 	bool loadEffectFromMemory(const char *pMem);
+	bool loadEffectFromFile(const char *pFilename);
 	bool createBuffer();
 	bool creatVertexLayout();
 private:
@@ -55,5 +50,10 @@ private:
 
 	//Vertex Layout
 	ID3D10InputLayout*      m_pTempVertexLayout;
+
+	//Variables for Camera
+	//XMMATRIX  m_World;
+	//XMMATRIX  m_View;
+	//XMMATRIX  m_Projection;
 
 };

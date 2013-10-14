@@ -55,6 +55,14 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(TargetDir)\Effects
+copy $(ProjectDir)\Effects\*.fx $(TargetDir)\Effects\*.fx</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>
+      </Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -88,6 +96,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Effects\Texture.fx" />
+    <None Include="Effects\Transform.fx" />
     <None Include="game.cfg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
