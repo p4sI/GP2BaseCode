@@ -235,13 +235,14 @@ bool D3D10Renderer::createBuffer()
 {
 	Vertex verts[]={
 		{-1.0f,-1.0f,0.0f},
-		{0.0f,1.0f,0.0f},
-		{1.0f,-1.0f,0.0f}
+		{-1.0f,1.0f,0.0f},
+		{1.0f,-1.0f,0.0f},
+		{1.0f,1.0f,0.0f}
 	};
 	//Buffer desc
 	D3D10_BUFFER_DESC bd;
 	bd.Usage = D3D10_USAGE_DEFAULT;//Usuage flag,this describes how the buffer is read/written to. Default is the most common - BMD
-	bd.ByteWidth = sizeof( Vertex ) * 3;//The size of the buffer, this is the size of one vertex * by the num of vertices -BMD
+	bd.ByteWidth = sizeof( Vertex ) * 4;//The size of the buffer, this is the size of one vertex * by the num of vertices -BMD
 	bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;//BindFlags, says how the buffer is going to be used. In this case as a Vertex Buffer - BMD
 	bd.CPUAccessFlags = 0;//CPUAccessFlag, sepcfies if the CPU can access the resource. 0 means no CPU access - BMD
 	bd.MiscFlags = 0;//MiscCreation flags, this will be zero most of the time - BMD
@@ -297,7 +298,7 @@ void D3D10Renderer::clear(float r,float g,float b,float a)
 void D3D10Renderer::render()
 {
 	//Set the type of primitive
-	m_pD3D10Device->IASetPrimitiveTopology( D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	m_pD3D10Device->IASetPrimitiveTopology( D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP );
 
 	//Set Vertex Laout
 	m_pD3D10Device->IASetInputLayout(m_pTempVertexLayout);
@@ -322,7 +323,7 @@ void D3D10Renderer::render()
 	{
 		ID3D10EffectPass *pCurrentPass=m_pTempTechnique->GetPassByIndex(i);
 		pCurrentPass->Apply(0);
-		m_pD3D10Device->Draw(3,0);
+		m_pD3D10Device->Draw(4,0);
 	}
 
 	
