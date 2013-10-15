@@ -3,8 +3,13 @@
 //The header file for the renderer interface
 #include "../Renderer/Renderer.h"
 #include <Windows.h>
+#include <D3D10.h>
+#include <D3DX10.h>
+#define _XM_NO_INTRINSICS_
+#include <xnamath.h>
 
 //forward declarations of the D3D10 interfaces
+/*
 struct ID3D10Device;
 struct IDXGISwapChain;
 struct ID3D10RenderTargetView;
@@ -14,7 +19,7 @@ struct ID3D10Effect;
 struct ID3D10Buffer;
 struct ID3D10InputLayout;
 struct ID3D10EffectTechnique;
-
+*/
 //D3D10Renderer implements the Renderer interface
 class D3D10Renderer:public IRenderer
 {
@@ -37,6 +42,7 @@ private:
 	bool loadEffectFromMemory(const char* pMem);
 	bool createBuffer();
 	bool createVertexLayout();
+	bool loadEffectFromFile(WCHAR* pFilename);
 private:
 	//D3D10 stuff
 	ID3D10Device *m_pD3D10Device;
@@ -48,4 +54,10 @@ private:
 	ID3D10Buffer *m_pTempBuffer;
 	ID3D10InputLayout *m_pTempVertexLayout;
 	ID3D10EffectTechnique *m_pTempTechnique;
+	XMMATRIX m_View;
+	XMMATRIX m_Projection;
+	XMMATRIX m_World;
+	ID3D10EffectMatrixVariable *m_pWorldEffectVariable;
+	ID3D10EffectMatrixVariable *m_pViewEffectVariable;
+	ID3D10EffectMatrixVariable *m_pProjectionEffectVariable;
 };
