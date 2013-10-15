@@ -130,6 +130,8 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 				0.1f,									// near clip
 				100.f);									// far clip
 
+	positionObject(2,0,0);
+
 	return true;
 }
 
@@ -496,4 +498,9 @@ void D3D10Renderer::createCamera(XMVECTOR &position, XMVECTOR &focus, XMVECTOR &
 	m_View = XMMatrixLookAtLH(position, focus, up);		
 	//proj matrix represents a virtual capped pyramid which governs what the camera can see
 	m_Projection = XMMatrixPerspectiveFovLH(fov, aspectRatio, nearClip, farClip);
+}
+
+void D3D10Renderer::positionObject(float x, float y, float z)
+{
+	m_World = XMMatrixTranslation(x, y, z);
 }

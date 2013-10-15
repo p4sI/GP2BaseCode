@@ -36,6 +36,7 @@ public:
 	void render();
 	void createCamera(XMVECTOR &position, XMVECTOR &focus, XMVECTOR &up,
 			float fov, float aspectRatio, float nearClip, float farClip);
+	void positionObject(float x, float y, float z);
 
 private:
 	bool createDevice(HWND pWindowHandle, int windowWidth, int windowHeight,
