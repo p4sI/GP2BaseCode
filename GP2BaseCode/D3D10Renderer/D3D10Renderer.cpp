@@ -117,7 +117,18 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 		return false;
 	if(!createBuffer())
 		return false;
-	
+
+	XMFLOAT3 cameraPos = XMFLOAT3(0.0f, 0.0f, -10.0f);	// camera Pos: x = 0, y = 0, z = -10
+	XMFLOAT3 focusPos = XMFLOAT3(0.0f, 0.0f, 0.0f);		// look at 0/0/0
+	XMFLOAT3 up = XMFLOAT3(0.0f, 1.0f, 0.0f);			// y-axis goes up
+
+	createCamera(XMLoadFloat3(&cameraPos), 
+				XMLoadFloat3(&focusPos), 
+				XMLoadFloat3(&up),
+				XM_PI/4,								// FOV
+				(float)width/(float)height,				// ratio of screen dimension
+				0.1f,									// near clip
+				100.f);									// far clip
 
 	return true;
 }
@@ -477,4 +488,12 @@ bool D3D10Renderer::loadEffectFromFile(WCHAR* pFilename)
 	m_pTempTechnique=m_pTempEffect->GetTechniqueByName("Render");	//  retrieve the technique by name.
 
 	return true;
+}
+void D3D10Renderer::createCamera(XMVECTOR &position, XMVECTOR &focus, XMVECTOR &up,
+			float fov, float aspectRatio, float nearClip, float farClip)
+{
+	// create ViewMAtrix, represents camera
+	m_View = XMMatrixLookAtLH(position, focus, up);		
+	//proj matrix represents a virtual capped pyramid which governs what the camera can see
+	m_Projection = XMMatrixPerspectiveFovLH(fov, aspectRatio, nearClip, farClip);
 }
