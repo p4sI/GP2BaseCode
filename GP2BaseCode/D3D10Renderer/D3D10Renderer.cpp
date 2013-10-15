@@ -5,6 +5,7 @@
 struct Vertex
 {
 	float x,y,z;
+	float tu, tv;
 };
 
 /* this defines the layout of a single vertex and includes the name of the 
@@ -20,7 +21,14 @@ const D3D10_INPUT_ELEMENT_DESC VertexLayout[] =
 	0, 
 	0, 
 	D3D10_INPUT_PER_VERTEX_DATA, 
-	0 }, 
+	0 },
+	{"TEXTCOORD",
+	0,
+	DXGI_FORMAT_R32G32_FLOAT,
+	0,
+	12,
+	D3D10_INPUT_PER_VERTEX_DATA,
+	0 },
 };
 
 
@@ -396,10 +404,10 @@ bool D3D10Renderer::createBuffer()
 	};
 
 	Vertex verts[] = {			// square
-		{-1.0f, -1.0f, 0.0f},	// 
-		{-1.0f,  1.0f, 0.0f},	// 
-		{ 1.0f, -1.0f, 0.0f},	// 
-		{ 1.0f,  1.0f, 1.0f}	// 
+		{-1.0f, -1.0f, 0.0f, 0.0f, 1.0f},	// lower left corner
+		{-1.0f,  1.0f, 0.0f, 0.0f, 0.0f },	// top left corner
+		{ 1.0f, -1.0f, 0.0f, 1.0f, 1.0f},	// lower right corner
+		{ 1.0f,  1.0f, 0.0f, 1.0f, 0.0f}	// top right corner
 	};
 
 	
