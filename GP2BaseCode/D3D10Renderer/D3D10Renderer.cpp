@@ -298,7 +298,7 @@ void D3D10Renderer::render()
 	/* tell the pipeline what primitives it will draw and the input-layout of the vertices. 
 	Input-layout objects describe how vertex buffer data is streamed into the IA pipeline stage*/
 	m_pD3D10Device->IASetPrimitiveTopology(
-					D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+		D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP );
 	m_pD3D10Device->IASetInputLayout(m_pTempVertexLayout);
 
 
@@ -323,7 +323,7 @@ void D3D10Renderer::render()
 	{
 		ID3D10EffectPass *pCurrentPass = m_pTempTechnique->GetPassByIndex(i);	// grab the pass
 		pCurrentPass->Apply(0);			// apply it(this ensures that the pipeline states and shaders are all bound to the pipeline) 
-		m_pD3D10Device->Draw(3,0);		// Draw(number of vertices, start location in the buffer)
+		m_pD3D10Device->Draw(4,0);		// Draw(number of vertices, start location in the buffer)
 	}
 
 	
@@ -364,7 +364,7 @@ bool D3D10Renderer::loadEffectFromMemory(const char* pMem)
 
 bool D3D10Renderer::createBuffer()
 {
-	Vertex verts[] = {			// standart triangle
+	Vertex verts_old[] = {			// standart triangle
 		{-1.0f, -1.0f, 0.0f},	// lower left corner
 		{ 0.0f,  1.0f, 0.0f},	// mid of top
 		{ 1.0f, -1.0f, 0.0f}	// lower right corner
@@ -376,18 +376,18 @@ bool D3D10Renderer::createBuffer()
 		{ 1.0f, -1.0f, 0.0f}	// lower right corner
 	};
 
-	Vertex verts2[] = {			// square
-		{-1.0f,  1.0f, 0.0f},	// top left corner
-		{ 0.0f,  1.0f, 0.0f},	// mid of top
-		{ 0.0f, -1.0f, 0.0f},	// mid of bottom
-		{-1.0f, -1.0f, 0.0f}	// lower left corner
+	Vertex verts[] = {			// square
+		{-1.0f, -1.0f, 0.0f},	// 
+		{-1.0f,  1.0f, 0.0f},	// 
+		{ 1.0f, -1.0f, 0.0f},	// 
+		{ 1.0f,  1.0f, 1.0f}	// 
 	};
 
 	
 	// Defines the propertys of the buffer
 	D3D10_BUFFER_DESC bd;
 	bd.Usage = D3D10_USAGE_DEFAULT;			// Identify how the buffer is expected to be read from and written to
-	bd.ByteWidth = sizeof( Vertex ) * 3;	// buffer is big enough for 3 vertices
+	bd.ByteWidth = sizeof( Vertex ) * 4;	// buffer is big enough for 4 vertices
 	bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;// Identify how the buffer will be bound to the pipeline
 	bd.CPUAccessFlags = 0;					// CPU access flags ( 0 if no CPU access is necessary)
 	bd.MiscFlags = 0;						// Miscellaneous flags ( 0 if unused)
