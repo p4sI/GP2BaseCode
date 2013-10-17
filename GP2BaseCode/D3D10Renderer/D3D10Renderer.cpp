@@ -48,6 +48,11 @@ D3D10Renderer::D3D10Renderer()
 	m_pTempEffect=NULL;
 	m_pTempBuffer=NULL;
 	m_pTempVertexLayout=NULL;
+
+	m_View=XMMatrixIdentity();
+	m_Projection=XMMatrixIdentity();
+
+	m_World=XMMatrixIdentity();
 }
 
 D3D10Renderer::~D3D10Renderer()
@@ -101,24 +106,20 @@ bool D3D10Renderer::init(void *pWindowHandle,bool fullScreen)
 	XMFLOAT3 focusPos=XMFLOAT3(0.0f,0.0f,0.0f);
 	XMFLOAT3 up=XMFLOAT3(0.0f,1.0f,0.0f);
 	//Calculate World View
-	createCamera(XMLoadFloat3(&cameraPos),XMLoadFloat3(&focusPos),XMLoadFloat3(&up),XM_PI/4,(float)width/(float)height,0.1f,100.0f);
+	createCamera(XMLoadFloat3(&cameraPos),XMLoadFloat3(&focusPos),XMLoadFloat3(&up),
+		XM_PI/4,(float)width/(float)height,0.1f,100.0f);
 	setSquarePosition(0.0f,0.0f,0.0f);
 	return true;
 }
 
 void D3D10Renderer::createCamera(XMVECTOR &position, XMVECTOR &focus,XMVECTOR &up,float fov,float aspectRatio,float nearClip,float farClip)
 {
-	m_View=XMMatrixIdentity();
-	m_Projection=XMMatrixIdentity();
-
 	m_View=XMMatrixLookAtLH(position,focus,up);
 	m_Projection=XMMatrixPerspectiveFovLH(fov,aspectRatio,nearClip,farClip);
 }
 
 void D3D10Renderer::setSquarePosition(float x,float y,float z)
 {
-	m_World=XMMatrixIdentity();
-
 	m_World=XMMatrixTranslation(x,y,z);
 }
 

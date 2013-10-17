@@ -34,7 +34,8 @@ bool fullScreen);
 	bool loadEffectFromFile(const char *pFilename);
 	bool createBuffer();
 	bool creatVertexLayout();
-	void createCamera(XMVECTOR &position, XMVECTOR &focu,XMVECTOR &up,float fov,float aspectRatio,float nearClip,float farClip);
+	void createCamera(XMVECTOR &position, XMVECTOR &focu,XMVECTOR &up,
+		float fov,float aspectRatio,float nearClip,float farClip);
 	void setSquarePosition(float x,float y,float z);
 private:
 	//D3D10 stuff
