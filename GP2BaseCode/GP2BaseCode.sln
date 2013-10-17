@@ -19,6 +19,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "D3D10Renderer", "D3D10Rende
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Effects", "Effects", "{F0202424-62D1-461E-A515-783E14349D74}"
 	ProjectSection(SolutionItems) = preProject
+		Lab1\Effects\Texture.fx = Lab1\Effects\Texture.fx
 		Debug\Effects\Transform.fx = Debug\Effects\Transform.fx
 	EndProjectSection
 EndProject

@@ -46,6 +46,7 @@ private:
 	bool createBuffer();
 	bool createVertexLayout();
 	bool loadEffectFromFile(WCHAR* pFilename);
+	bool loadBaseTexture(char* pFilename);
 private:
 	//D3D10 stuff
 	ID3D10Device *m_pD3D10Device;
@@ -63,4 +64,6 @@ private:
 	ID3D10EffectMatrixVariable *m_pWorldEffectVariable;
 	ID3D10EffectMatrixVariable *m_pViewEffectVariable;
 	ID3D10EffectMatrixVariable *m_pProjectionEffectVariable;
+	ID3D10ShaderResourceView *m_pBaseTextureMap;
+	ID3D10EffectShaderResourceVariable *m_pBaseTextureEffectVariable;
 };

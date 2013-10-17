@@ -92,6 +92,8 @@ D3D10Renderer::~D3D10Renderer()
 		m_pTempEffect->Release();
 	if(m_pTempVertexLayout)
 		m_pTempVertexLayout->Release();
+	if(m_pBaseTextureMap)
+		m_pBaseTextureMap->Release();
 }
 
 /* 
@@ -119,12 +121,14 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 		return false;
 	if(!createInitialRenderTarget(width, height))
 		return false;
-	if(!loadEffectFromFile(TEXT("Effects/Transform.fx")))
+	if(!loadEffectFromFile(TEXT("Effects/Texture.fx")))
 		return false;
 	if(!createVertexLayout())
 		return false;
 	if(!createBuffer())
 		return false;
+	if (!loadBaseTexture("Textures/face.png"))
+        return false;
 
 	XMFLOAT3 cameraPos = XMFLOAT3(0.0f, 0.0f, -10.0f);	// camera Pos: x = 0, y = 0, z = -10
 	XMFLOAT3 focusPos = XMFLOAT3(0.0f, 0.0f, 0.0f);		// look at 0/0/0
@@ -321,6 +325,7 @@ void D3D10Renderer::render()
 	m_pWorldEffectVariable->SetMatrix((float*)&m_World);
 	m_pViewEffectVariable->SetMatrix((float*)&m_View);
 	m_pProjectionEffectVariable->SetMatrix((float*)&m_Projection);
+	m_pBaseTextureEffectVariable->SetResource(m_pBaseTextureMap);
 	
 	/* tell the pipeline what primitives it will draw and the input-layout of the vertices. 
 	Input-layout objects describe how vertex buffer data is streamed into the IA pipeline stage*/
@@ -489,13 +494,12 @@ bool D3D10Renderer::loadEffectFromFile(WCHAR* pFilename)
 		OutputDebugStringA((char*)pErrorBuffer->GetBufferPointer());
 		return false;
 	}
-
+	
+	m_pTempTechnique = m_pTempEffect->GetTechniqueByName("Render");	//  retrieve the technique by name.
 	m_pWorldEffectVariable = m_pTempEffect->GetVariableByName("matWorld")->AsMatrix();
 	m_pViewEffectVariable = m_pTempEffect->GetVariableByName("matView")->AsMatrix();
 	m_pProjectionEffectVariable = m_pTempEffect->GetVariableByName("matProjection")->AsMatrix();
-
-
-	m_pTempTechnique=m_pTempEffect->GetTechniqueByName("Render");	//  retrieve the technique by name.
+	m_pBaseTextureEffectVariable = m_pTempEffect->GetVariableByName("diffuseTexture")->AsShaderResource();
 
 	return true;
 }
@@ -511,4 +515,20 @@ void D3D10Renderer::createCamera(XMVECTOR &position, XMVECTOR &focus, XMVECTOR &
 void D3D10Renderer::positionObject(float x, float y, float z)
 {
 	m_World = XMMatrixTranslation(x, y, z);
+}
+
+// takes in a filename and loads the texture into a shader resource view
+bool D3D10Renderer::loadBaseTexture(char* pFilename)
+{
+	if(FAILED(D3DX10CreateShaderResourceViewFromFileA(
+		m_pD3D10Device,
+		pFilename,
+		NULL,
+		NULL,
+		&m_pBaseTextureMap,
+		NULL))){
+
+		return false;
+	}
+	return true;
 }
