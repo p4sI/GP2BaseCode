@@ -45,7 +45,7 @@ private:
 	bool loadEffectFromMemory(const char* pMem);
 	bool createBuffer();
 	bool createVertexLayout();
-	bool loadEffectFromFile(WCHAR* pFilename);
+	bool loadEffectFromFile(char* pFilename);
 	bool loadBaseTexture(char* pFilename);
 private:
 	//D3D10 stuff

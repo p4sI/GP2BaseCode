@@ -72,7 +72,7 @@ bool CGameApplication::initPhysics()
 bool CGameApplication::initGraphics()
 {
 	// Check our settings first, to see what graphics mode we are in
-	 m_pRenderer = new D3D10Renderer();
+	m_pRenderer = new D3D10Renderer();
 	if (!m_pRenderer->init(m_pWindow->getHandleToWindow(), m_GameOptionDesc.fullscreen))
 		return false;
 
@@ -117,7 +117,7 @@ void CGameApplication::run()
 //Render, called to draw one frame of the game
 void CGameApplication::render()
 {
-	m_pRenderer->clear(0.0f, 1.0f, 0.0f, 1.0f);
+	m_pRenderer->clear(0.0f, 0.0f, 0.5f, 1.0f);
 	m_pRenderer->render();
 	m_pRenderer->present();
 }

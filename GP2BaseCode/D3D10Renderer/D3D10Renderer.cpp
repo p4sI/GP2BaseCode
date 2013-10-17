@@ -22,7 +22,7 @@ const D3D10_INPUT_ELEMENT_DESC VertexLayout[] =
 	0, 
 	D3D10_INPUT_PER_VERTEX_DATA, 
 	0 },
-	{"TEXTCOORD",
+	{"TEXCOORD",
 	0,
 	DXGI_FORMAT_R32G32_FLOAT,
 	0,
@@ -121,7 +121,7 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 		return false;
 	if(!createInitialRenderTarget(width, height))
 		return false;
-	if(!loadEffectFromFile(TEXT("Effects/Texture.fx")))
+	if(!loadEffectFromFile("Effects/Texture.fx"))
 		return false;
 	if(!createVertexLayout())
 		return false;
@@ -142,7 +142,7 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 				0.1f,									// near clip
 				100.f);									// far clip
 
-	positionObject(2,0,0);
+	positionObject(0,0,0);
 
 	return true;
 }
@@ -469,7 +469,7 @@ bool D3D10Renderer::createVertexLayout()
 	return true;
 }
 
-bool D3D10Renderer::loadEffectFromFile(WCHAR* pFilename)
+bool D3D10Renderer::loadEffectFromFile(char* pFilename)
 {
 	DWORD dwShaderFlags = D3D10_SHADER_ENABLE_STRICTNESS;
 #if defined( DEBUG ) || defined( _DEBUG )
@@ -477,7 +477,7 @@ bool D3D10Renderer::loadEffectFromFile(WCHAR* pFilename)
 #endif
 
 	ID3D10Blob *pErrorBuffer = NULL;
-	if (FAILED(D3DX10CreateEffectFromFile(
+	if (FAILED(D3DX10CreateEffectFromFileA(
 		pFilename,			// pointer to the file which holds the effect
 		NULL,
 		NULL,
@@ -499,7 +499,7 @@ bool D3D10Renderer::loadEffectFromFile(WCHAR* pFilename)
 	m_pWorldEffectVariable = m_pTempEffect->GetVariableByName("matWorld")->AsMatrix();
 	m_pViewEffectVariable = m_pTempEffect->GetVariableByName("matView")->AsMatrix();
 	m_pProjectionEffectVariable = m_pTempEffect->GetVariableByName("matProjection")->AsMatrix();
-	m_pBaseTextureEffectVariable = m_pTempEffect->GetVariableByName("diffuseTexture")->AsShaderResource();
+	m_pBaseTextureEffectVariable = m_pTempEffect->GetVariableByName("diffuseMap")->AsShaderResource();
 
 	return true;
 }
