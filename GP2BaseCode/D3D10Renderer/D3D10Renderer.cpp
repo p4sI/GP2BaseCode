@@ -48,6 +48,7 @@ D3D10Renderer::D3D10Renderer()
 	m_pTempEffect=NULL;
 	m_pTempBuffer=NULL;
 	m_pTempVertexLayout=NULL;
+	m_pTempIndexBuffer=NULL;
 
 	m_View=XMMatrixIdentity();
 	m_Projection=XMMatrixIdentity();
@@ -66,7 +67,8 @@ D3D10Renderer::~D3D10Renderer()
 		m_pTempVertexLayout->Release();
 	if (m_pTempBuffer)
 		m_pTempBuffer->Release();
-
+	if (m_pTempIndexBuffer)
+		m_pTempIndexBuffer->Release();
 	if (m_pRenderTargetView)
 		m_pRenderTargetView->Release();
 	if (m_pDepthStencelView)
@@ -323,6 +325,32 @@ bool D3D10Renderer::createBuffer()
 	{
 		OutputDebugStringA("Can't create buffer");
 	}
+
+	int indices[]={0,1,2,1,3,2};
+
+	//Buffer desc
+	D3D10_BUFFER_DESC indexbd;
+	indexbd.Usage = D3D10_USAGE_DEFAULT;//Usuage flag,this describes how the buffer is read/written to. Default is the most common - BMD
+	indexbd.ByteWidth = sizeof( int ) * 6;//The size of the buffer, this is the size of one vertex * by the num of vertices -BMD
+	indexbd.BindFlags = D3D10_BIND_INDEX_BUFFER;//BindFlags, says how the buffer is going to be used. In this case as a Vertex Buffer - BMD
+	indexbd.CPUAccessFlags = 0;//CPUAccessFlag, sepcfies if the CPU can access the resource. 0 means no CPU access - BMD
+	indexbd.MiscFlags = 0;//MiscCreation flags, this will be zero most of the time - BMD
+
+	//This is used to supply the initial data for the buffer - BMD
+	//http://msdn.microsoft.com/en-us/library/bb172456%28VS.85%29.aspx - BMD
+	D3D10_SUBRESOURCE_DATA InitIBData;
+	//A pointer to the initial data
+	InitIBData.pSysMem = &indices;
+    
+	//Create the Buffer using the buffer description and initial data - BMD
+	//http://msdn.microsoft.com/en-us/library/bb173544%28v=VS.85%29.aspx - BMD
+	if (FAILED(m_pD3D10Device->CreateBuffer( 
+		&indexbd, //Memory address of a buffer description - BMD
+		&InitIBData, //Memory address of the initial data - BMD
+		&m_pTempIndexBuffer )))//A pointer to a memory address of a buffer, this will be initialise after - BMD
+	{
+		OutputDebugStringA("Can't create buffer");
+	}
 	return true;
 }
 
@@ -368,6 +396,7 @@ void D3D10Renderer::render()
 
 	//Set Vertex Laout
 	m_pD3D10Device->IASetInputLayout(m_pTempVertexLayout);
+	m_pD3D10Device->IASetIndexBuffer(m_pTempIndexBuffer,DXGI_FORMAT_R32_UINT,0);
 
     //Get the stride(size) of the a vertex, we need this to tell the pipeline the size of one vertex - BMD
     UINT stride = sizeof( Vertex );
@@ -389,7 +418,7 @@ void D3D10Renderer::render()
 	{
 		ID3D10EffectPass *pCurrentPass=m_pTempTechnique->GetPassByIndex(i);
 		pCurrentPass->Apply(0);
-		m_pD3D10Device->Draw(4,0);
+		m_pD3D10Device->DrawIndexed(6,0,0);
 	}
 
 	
