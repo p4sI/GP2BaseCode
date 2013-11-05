@@ -5,6 +5,7 @@
 struct Vertex
 {
 	float x,y,z;
+	float nx,ny,nz;
 };
 
 /* this defines the layout of a single vertex and includes the name of the 
@@ -20,7 +21,15 @@ const D3D10_INPUT_ELEMENT_DESC VertexLayout[] =
 	0, 
 	0, 
 	D3D10_INPUT_PER_VERTEX_DATA, 
-	0 }, 
+	0 },
+	{ "NORMAL",
+	0, 
+	DXGI_FORMAT_R32G32B32_FLOAT, 
+	0, 
+	12, 
+	D3D10_INPUT_PER_VERTEX_DATA, 
+	0 }
+
 };
 
 
@@ -84,6 +93,8 @@ D3D10Renderer::~D3D10Renderer()
 		m_pTempEffect->Release();
 	if(m_pTempVertexLayout)
 		m_pTempVertexLayout->Release();
+	if(m_pTempIndexBuffer)
+		m_pTempIndexBuffer->Release();
 }
 
 /* 
@@ -111,7 +122,7 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 		return false;
 	if(!createInitialRenderTarget(width, height))
 		return false;
-	if(!loadEffectFromFile(TEXT("Effects/Transform.fx")))
+	if(!loadEffectFromFile(TEXT("Effects/ambient.fx")))
 		return false;
 	if(!createVertexLayout())
 		return false;
@@ -121,6 +132,9 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 	XMFLOAT3 cameraPos = XMFLOAT3(0.0f, 0.0f, -10.0f);	// camera Pos: x = 0, y = 0, z = -10
 	XMFLOAT3 focusPos = XMFLOAT3(0.0f, 0.0f, 0.0f);		// look at 0/0/0
 	XMFLOAT3 up = XMFLOAT3(0.0f, 1.0f, 0.0f);			// y-axis goes up
+
+	m_ambientMaterial = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	m_ambientLightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	createCamera(XMLoadFloat3(&cameraPos), 
 				XMLoadFloat3(&focusPos), 
@@ -313,6 +327,8 @@ void D3D10Renderer::render()
 	m_pWorldEffectVariable->SetMatrix((float*)&m_World);
 	m_pViewEffectVariable->SetMatrix((float*)&m_View);
 	m_pProjectionEffectVariable->SetMatrix((float*)&m_Projection);
+	m_pAmbientMaterialVariable->SetFloatVector((float*)&m_ambientMaterial);
+	m_pAmbientLightColourVariable->SetFloatVector((float*)&m_ambientLightColour);
 	
 	/* tell the pipeline what primitives it will draw and the input-layout of the vertices. 
 	Input-layout objects describe how vertex buffer data is streamed into the IA pipeline stage*/
@@ -334,6 +350,13 @@ void D3D10Renderer::render()
 		&stride,			// Pointer to an array of stride values; one stride value for each buffer in the vertex-buffer array
 		&offset );			// Pointer to an array of offset values; one offset value for each buffer in the vertex-buffer array
 
+	// binding the index buffer
+	m_pD3D10Device->IASetIndexBuffer(
+		m_pTempIndexBuffer,
+		DXGI_FORMAT_R32_UINT,
+		0);
+
+
 	// to get information about the technique such as the number of passes
 	D3D10_TECHNIQUE_DESC techniqueDesc;
 	m_pTempTechnique->GetDesc(&techniqueDesc);
@@ -342,7 +365,7 @@ void D3D10Renderer::render()
 	{
 		ID3D10EffectPass *pCurrentPass = m_pTempTechnique->GetPassByIndex(i);	// grab the pass
 		pCurrentPass->Apply(0);			// apply it(this ensures that the pipeline states and shaders are all bound to the pipeline) 
-		m_pD3D10Device->Draw(4,0);		// Draw(number of vertices, start location in the buffer)
+		m_pD3D10Device->DrawIndexed(36,0,0);		// DrawIndexed(number of vertices, start location in the buffer, base vertex location)
 	}
 
 	
@@ -383,6 +406,7 @@ bool D3D10Renderer::loadEffectFromMemory(const char* pMem)
 
 bool D3D10Renderer::createBuffer()
 {
+	
 	Vertex verts_old[] = {			// standart triangle
 		{-1.0f, -1.0f, 0.0f},	// lower left corner
 		{ 0.0f,  1.0f, 0.0f},	// mid of top
@@ -395,18 +419,31 @@ bool D3D10Renderer::createBuffer()
 		{ 1.0f, -1.0f, 0.0f}	// lower right corner
 	};
 
-	Vertex verts[] = {			// square
+	Vertex vertsSquare[] = {			// square
 		{-1.0f, -1.0f, 0.0f},	// 
 		{-1.0f,  1.0f, 0.0f},	// 
 		{ 1.0f, -1.0f, 0.0f},	// 
-		{ 1.0f,  1.0f, 1.0f}	// 
+		{ 1.0f,  1.0f, 0.0f}	// 
+	};
+
+	Vertex verts[] = {										// cube			
+		// x, 	 y,     z 		normals: x	y		z
+		{-1.0f, -1.0f,  1.0f,		0.0f,  0.5f,  0.5f},	// front face 
+		{-1.0f,  1.0f,  1.0f,		0.0f,  0.5f,  0.5f},	// 
+		{ 1.0f, -1.0f,  1.0f,		0.0f, -0.5f,  0.5f},	// 
+		{ 1.0f,  1.0f,  1.0f,		0.0f, -0.5f,  0.5f},	//
+
+		{-1.0f, -1.0f, -1.0f,		0.0f,  0.5f, -0.5f},	// back face
+		{-1.0f,  1.0f, -1.0f,		0.0f,  0.5f, -0.5f},	// 
+		{ 1.0f, -1.0f, -1.0f,		0.0f, -0.5f, -0.5f},	// 
+		{ 1.0f,  1.0f, -1.0f,		0.0f, -0.5f, -0.5f}	    // 
 	};
 
 	
 	// Defines the propertys of the buffer
 	D3D10_BUFFER_DESC bd;
 	bd.Usage = D3D10_USAGE_DEFAULT;			// Identify how the buffer is expected to be read from and written to
-	bd.ByteWidth = sizeof( Vertex ) * 4;	// buffer is big enough for 4 vertices
+	bd.ByteWidth = sizeof( Vertex ) * 8;	// buffer is big enough for 8 vertices
 	bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;// Identify how the buffer will be bound to the pipeline
 	bd.CPUAccessFlags = 0;					// CPU access flags ( 0 if no CPU access is necessary)
 	bd.MiscFlags = 0;						// Miscellaneous flags ( 0 if unused)
@@ -415,9 +452,9 @@ bool D3D10Renderer::createBuffer()
 	D3D10_SUBRESOURCE_DATA InitData;
 	InitData.pSysMem = &verts;
 
-	/* CreateBufer(): Create a buffer (vertex buffer, index buffer, or shader-constant buffer).
-	   http://msdn.microsoft.com/en-us/library/windows/desktop/bb173544%28v=vs.85%29.aspx
-	*/
+	// CreateBufer(): Create a buffer (vertex buffer, index buffer, or shader-constant buffer).
+	//   http://msdn.microsoft.com/en-us/library/windows/desktop/bb173544%28v=vs.85%29.aspx
+	
 	if (FAILED(m_pD3D10Device->CreateBuffer(
 			&bd,				// Pointer to a buffer description
 			&InitData,			// Pointer to the initialization data
@@ -425,6 +462,46 @@ bool D3D10Renderer::createBuffer()
 	{
 		OutputDebugStringA("Cant create buffer");	
 	}
+	
+
+	int indices[36] = {0, 1, 2, // front face
+					  1, 2, 3,
+
+					  4, 5, 6,	// back face
+					  5, 6, 7,
+
+					  4, 5, 0,	// left face
+					  5, 0, 1,
+
+					  2, 3, 6,	// right face
+					  3, 6, 7,
+
+					  1, 5, 3,	// top face
+					  5, 3, 7,
+
+					  0, 4, 2,	// bottom face
+					  4, 2, 6};
+
+	D3D10_BUFFER_DESC indexBD;
+	indexBD.Usage = D3D10_USAGE_DEFAULT;
+	indexBD.ByteWidth = sizeof(int) * 36;
+	indexBD.BindFlags = D3D10_BIND_INDEX_BUFFER;
+	indexBD.CPUAccessFlags = 0;
+	indexBD.MiscFlags = 0;
+
+	D3D10_SUBRESOURCE_DATA InitlBData;
+	InitlBData.pSysMem = &indices;
+
+	if (FAILED(m_pD3D10Device->CreateBuffer(
+			&indexBD,			// Pointer to a buffer description
+			&InitlBData,		// Pointer to the initialization data
+			&m_pTempIndexBuffer )))	// Address of a pointer to the buffer created 
+	{
+		OutputDebugStringA("Cant create buffer");	
+	}
+
+
+
 
 	return true;
 }
@@ -485,7 +562,8 @@ bool D3D10Renderer::loadEffectFromFile(WCHAR* pFilename)
 	m_pWorldEffectVariable = m_pTempEffect->GetVariableByName("matWorld")->AsMatrix();
 	m_pViewEffectVariable = m_pTempEffect->GetVariableByName("matView")->AsMatrix();
 	m_pProjectionEffectVariable = m_pTempEffect->GetVariableByName("matProjection")->AsMatrix();
-
+	m_pAmbientMaterialVariable = m_pTempEffect->GetVariableByName("ambientMaterial")->AsVector();
+	m_pAmbientLightColourVariable = m_pTempEffect->GetVariableByName("ambientLightColour")->AsVector();
 
 	m_pTempTechnique=m_pTempEffect->GetTechniqueByName("Render");	//  retrieve the technique by name.
 
