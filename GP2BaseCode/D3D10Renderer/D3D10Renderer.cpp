@@ -508,7 +508,7 @@ void D3D10Renderer::createCamera(XMVECTOR &position, XMVECTOR &focus, XMVECTOR &
 {
 	// create ViewMAtrix, represents camera
 	m_View = XMMatrixLookAtLH(position, focus, up);		
-	//proj matrix represents a virtual capped pyramid which governs what the camera can see
+	// proj matrix represents a virtual capped pyramid which governs what the camera can see
 	m_Projection = XMMatrixPerspectiveFovLH(fov, aspectRatio, nearClip, farClip);
 }
 
@@ -520,7 +520,7 @@ void D3D10Renderer::positionObject(float x, float y, float z)
 // takes in a filename and loads the texture into a shader resource view
 bool D3D10Renderer::loadBaseTexture(char* pFilename)
 {
-	if(FAILED(D3DX10CreateShaderResourceViewFromFileA(
+	if(FAILED(D3DX10CreateShaderResourceViewFromFileA(		// D3DX10: x - extended library
 		m_pD3D10Device,
 		pFilename,
 		NULL,
