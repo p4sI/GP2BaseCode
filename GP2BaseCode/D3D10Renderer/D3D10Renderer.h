@@ -64,8 +64,24 @@ private:
 	ID3D10EffectMatrixVariable *m_pViewEffectVariable;
 	ID3D10EffectMatrixVariable *m_pProjectionEffectVariable;
 	ID3D10Buffer * m_pTempIndexBuffer;
+	// Ambient Effect Stuff
 	ID3D10EffectVectorVariable *m_pAmbientMaterialVariable; 
 	ID3D10EffectVectorVariable *m_pAmbientLightColourVariable;
 	XMFLOAT4 m_ambientMaterial; 
 	XMFLOAT4 m_ambientLightColour;
+	// Diffuse Effect Stuff
+	ID3D10EffectVectorVariable *m_pDiffuseMaterialVariable; 
+	ID3D10EffectVectorVariable *m_pDiffuseLightColourVariable;
+	ID3D10EffectVectorVariable *m_pLightDirectionVariable;
+	XMFLOAT4 m_diffuseMaterial; 
+	XMFLOAT4 m_diffuseLightColour;
+	XMFLOAT3 m_lightDirection;
+	// Specular Effect Stuff
+	ID3D10EffectVectorVariable *m_pSpecularMaterialVariable; 
+	ID3D10EffectVectorVariable *m_pSpecularLightColourVariable;
+	ID3D10EffectVariable *m_pSpecularPower;
+	XMFLOAT4 m_specularMaterial; 
+	XMFLOAT4 m_specularLightColour;
+	float m_specularPower;
+
 };

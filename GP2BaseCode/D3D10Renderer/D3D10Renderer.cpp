@@ -122,7 +122,7 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 		return false;
 	if(!createInitialRenderTarget(width, height))
 		return false;
-	if(!loadEffectFromFile(TEXT("Effects/ambient.fx")))
+	if(!loadEffectFromFile(TEXT("Effects/specular.fx")))
 		return false;
 	if(!createVertexLayout())
 		return false;
@@ -135,6 +135,12 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 
 	m_ambientMaterial = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	m_ambientLightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_diffuseMaterial = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	m_diffuseLightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_lightDirection = XMFLOAT3(0.0f, 0.0f, 1.0f);
+	m_specularMaterial = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	m_specularLightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_specularPower = 25.0f;
 
 	createCamera(XMLoadFloat3(&cameraPos), 
 				XMLoadFloat3(&focusPos), 
@@ -329,6 +335,12 @@ void D3D10Renderer::render()
 	m_pProjectionEffectVariable->SetMatrix((float*)&m_Projection);
 	m_pAmbientMaterialVariable->SetFloatVector((float*)&m_ambientMaterial);
 	m_pAmbientLightColourVariable->SetFloatVector((float*)&m_ambientLightColour);
+	m_pDiffuseMaterialVariable->SetFloatVector((float*)&m_diffuseMaterial);
+	m_pDiffuseLightColourVariable->SetFloatVector((float*)&m_diffuseLightColour);
+	m_pLightDirectionVariable->SetFloatVector((float*)&m_lightDirection);
+	m_pSpecularMaterialVariable->SetFloatVector((float*)&m_diffuseMaterial);
+	m_pSpecularLightColourVariable->SetFloatVector((float*)&m_diffuseLightColour);
+	m_pSpecularPower->SetRawValue(&m_specularPower,0,sizeof(float)); //right??
 	
 	/* tell the pipeline what primitives it will draw and the input-layout of the vertices. 
 	Input-layout objects describe how vertex buffer data is streamed into the IA pipeline stage*/
@@ -564,6 +576,12 @@ bool D3D10Renderer::loadEffectFromFile(WCHAR* pFilename)
 	m_pProjectionEffectVariable = m_pTempEffect->GetVariableByName("matProjection")->AsMatrix();
 	m_pAmbientMaterialVariable = m_pTempEffect->GetVariableByName("ambientMaterial")->AsVector();
 	m_pAmbientLightColourVariable = m_pTempEffect->GetVariableByName("ambientLightColour")->AsVector();
+	m_pDiffuseMaterialVariable = m_pTempEffect->GetVariableByName("diffuseMaterial")->AsVector();
+	m_pDiffuseLightColourVariable = m_pTempEffect->GetVariableByName("diffuseLightColour")->AsVector();
+	m_pLightDirectionVariable = m_pTempEffect->GetVariableByName("lightDirection")->AsVector();
+	m_pSpecularMaterialVariable = m_pTempEffect->GetVariableByName("specularMaterial")->AsVector();
+	m_pSpecularLightColourVariable = m_pTempEffect->GetVariableByName("specularLightColour")->AsVector();
+	m_pSpecularPower = m_pTempEffect->GetVariableByName("specularPower");
 
 	m_pTempTechnique=m_pTempEffect->GetTechniqueByName("Render");	//  retrieve the technique by name.
 
