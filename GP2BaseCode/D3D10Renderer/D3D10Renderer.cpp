@@ -340,7 +340,7 @@ void D3D10Renderer::render()
 	m_pLightDirectionVariable->SetFloatVector((float*)&m_lightDirection);
 	m_pSpecularMaterialVariable->SetFloatVector((float*)&m_diffuseMaterial);
 	m_pSpecularLightColourVariable->SetFloatVector((float*)&m_diffuseLightColour);
-	m_pSpecularPower->SetRawValue(&m_specularPower,0,sizeof(float)); //right??
+	m_pSpecularPower->SetFloat(m_specularPower); //right??
 	
 	/* tell the pipeline what primitives it will draw and the input-layout of the vertices. 
 	Input-layout objects describe how vertex buffer data is streamed into the IA pipeline stage*/
@@ -581,7 +581,7 @@ bool D3D10Renderer::loadEffectFromFile(WCHAR* pFilename)
 	m_pLightDirectionVariable = m_pTempEffect->GetVariableByName("lightDirection")->AsVector();
 	m_pSpecularMaterialVariable = m_pTempEffect->GetVariableByName("specularMaterial")->AsVector();
 	m_pSpecularLightColourVariable = m_pTempEffect->GetVariableByName("specularLightColour")->AsVector();
-	m_pSpecularPower = m_pTempEffect->GetVariableByName("specularPower");
+	m_pSpecularPower = m_pTempEffect->GetVariableByName("specularPower")->AsScalar();
 
 	m_pTempTechnique=m_pTempEffect->GetTechniqueByName("Render");	//  retrieve the technique by name.
 

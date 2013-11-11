@@ -79,7 +79,7 @@ private:
 	// Specular Effect Stuff
 	ID3D10EffectVectorVariable *m_pSpecularMaterialVariable; 
 	ID3D10EffectVectorVariable *m_pSpecularLightColourVariable;
-	ID3D10EffectVariable *m_pSpecularPower;
+	ID3D10EffectScalarVariable *m_pSpecularPower;
 	XMFLOAT4 m_specularMaterial; 
 	XMFLOAT4 m_specularLightColour;
 	float m_specularPower;
