@@ -68,14 +68,14 @@ bool CGameApplication::initPhysics()
 	return true;
 }
 	
-//initGraphics - Initialises the graphic subsystem
+//initGraphics - Initialises the graphic subsystem 
 bool CGameApplication::initGraphics()
 {
 	// Check our settings first, to see what graphics mode we are in
 	m_pRenderer = new D3D10Renderer();
 	if (!m_pRenderer->init(m_pWindow->getHandleToWindow(), m_GameOptionDesc.fullscreen))
 		return false;
-	    
+	                       
 	return true;
 }
 
@@ -87,7 +87,7 @@ bool CGameApplication::initWindow()
 	 m_pWindow = new CWin32Window();
 	m_pWindow->init(m_GameOptionDesc.gameName,m_GameOptionDesc.width,
 					m_GameOptionDesc.height,m_GameOptionDesc.fullscreen);
-
+	  
 	return true;
 }
 

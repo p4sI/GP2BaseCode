@@ -129,18 +129,21 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 	if(!createBuffer())
 		return false;
 
-	XMFLOAT3 cameraPos = XMFLOAT3(0.0f, 0.0f, -10.0f);	// camera Pos: x = 0, y = 0, z = -10
+	XMFLOAT3 cameraPos = XMFLOAT3(0.0f, 3.0f, -10.0f);	// camera Pos: x = 0, y = 0, z = -10
 	XMFLOAT3 focusPos = XMFLOAT3(0.0f, 0.0f, 0.0f);		// look at 0/0/0
 	XMFLOAT3 up = XMFLOAT3(0.0f, 1.0f, 0.0f);			// y-axis goes up
-
-	m_ambientMaterial = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	//ambient
+	m_ambientMaterial = XMFLOAT4(0.4f, 0.0f, 0.0f, 1.0f);
 	m_ambientLightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_diffuseMaterial = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	//diffuse
+	m_diffuseMaterial = XMFLOAT4(0.8f, 0.0f, 0.0f, 1.0f);
 	m_diffuseLightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_lightDirection = XMFLOAT3(0.0f, 0.0f, 1.0f);
-	m_specularMaterial = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	m_lightDirection = XMFLOAT3(0.0f, -0.5f, -0.5f);
+	//specular
+	m_specularMaterial = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_specularLightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_specularPower = 25.0f;
+	m_specularPower = 30.0f;
+	m_CameraPos = XMFLOAT4(cameraPos.x, cameraPos.y, cameraPos.z, 0);
 
 	createCamera(XMLoadFloat3(&cameraPos), 
 				XMLoadFloat3(&focusPos), 
@@ -150,7 +153,7 @@ bool D3D10Renderer::init(void *pWindowHandle, bool fullScreen)
 				0.1f,									// near clip
 				100.f);									// far clip
 
-	positionObject(2,0,0);
+	positionObject(0,0,0);
 
 	return true;
 }
@@ -341,6 +344,7 @@ void D3D10Renderer::render()
 	m_pSpecularMaterialVariable->SetFloatVector((float*)&m_diffuseMaterial);
 	m_pSpecularLightColourVariable->SetFloatVector((float*)&m_diffuseLightColour);
 	m_pSpecularPower->SetFloat(m_specularPower); //right??
+	m_pCameraPosVariable->SetFloatVector((float*)&m_CameraPos);
 	
 	/* tell the pipeline what primitives it will draw and the input-layout of the vertices. 
 	Input-layout objects describe how vertex buffer data is streamed into the IA pipeline stage*/
@@ -582,6 +586,7 @@ bool D3D10Renderer::loadEffectFromFile(WCHAR* pFilename)
 	m_pSpecularMaterialVariable = m_pTempEffect->GetVariableByName("specularMaterial")->AsVector();
 	m_pSpecularLightColourVariable = m_pTempEffect->GetVariableByName("specularLightColour")->AsVector();
 	m_pSpecularPower = m_pTempEffect->GetVariableByName("specularPower")->AsScalar();
+	m_pCameraPosVariable = m_pTempEffect->GetVariableByName("cameraPosition")->AsVector();
 
 	m_pTempTechnique=m_pTempEffect->GetTechniqueByName("Render");	//  retrieve the technique by name.
 
