@@ -1,5 +1,6 @@
 #pragma once
 
+//http://www.gamedev.net/topic/506017-quick-question-about-id3d10inputlayout/
 //The header file for the renderer interface
 #include "../Renderer/Renderer.h"
 
@@ -24,19 +25,22 @@ public:
 	void clear(float r,float g,float b,float a);
 	void present();
 	void render();
+
+	ID3D10Effect * loadEffectFromMemory(const char *pMem);
+	ID3D10Effect * loadEffectFromFile(const char *pFilename);
 private:
 	bool createDevice(HWND pWindowHandle,int windowWidth, int windowHeight,
 bool fullScreen);
 	bool createInitialRenderTarget(int windowWidth, int windowHeight);
 
-	//temp for the exercise
-	bool loadEffectFromMemory(const char *pMem);
-	bool loadEffectFromFile(const char *pFilename);
-	bool createBuffer();
-	bool creatVertexLayout();
-	void createCamera(XMVECTOR &position, XMVECTOR &focu,XMVECTOR &up,
-		float fov,float aspectRatio,float nearClip,float farClip);
-	void setSquarePosition(float x,float y,float z);
+	////temp for the exercise
+	//bool loadEffectFromMemory(const char *pMem);
+	//bool loadEffectFromFile(const char *pFilename);
+	//bool createBuffer();
+	bool createVertexLayout();
+	//void createCamera(XMVECTOR &position, XMVECTOR &focu,XMVECTOR &up,
+	//	float fov,float aspectRatio,float nearClip,float farClip);
+	//void setSquarePosition(float x,float y,float z);
 private:
 	//D3D10 stuff
 	ID3D10Device * m_pD3D10Device;
@@ -45,28 +49,13 @@ private:
 	ID3D10DepthStencilView * m_pDepthStencelView;
 	ID3D10Texture2D *m_pDepthStencilTexture;
 
-	//for the exercise
-	//Effect
-	ID3D10Effect * m_pTempEffect;
-	ID3D10EffectTechnique*  m_pTempTechnique;
-
-	//Buffer
-	ID3D10Buffer * m_pTempBuffer;
-	ID3D10Buffer * m_pTempIndexBuffer;
-
 	//Vertex Layout
-	ID3D10InputLayout*      m_pTempVertexLayout;
-
-	//Variables for Camera
-	XMMATRIX  m_View;
-	XMMATRIX  m_Projection;
-
-	//For Object
-	XMMATRIX  m_World;
+	ID3D10InputLayout*      m_pDefaultVertexLayout;
+	//this will be used if we have no Effect
+	ID3D10Effect * m_pDefaultEffect;
 
 	//Effect Variables
 	ID3D10EffectMatrixVariable * m_pWorldEffectVariable;
 	ID3D10EffectMatrixVariable * m_pProjectionEffectVariable;
 	ID3D10EffectMatrixVariable * m_pViewEffectVariable;
-
 };
