@@ -2,7 +2,10 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
+#include "Components.h"
+#include "GameObject.h"
 using namespace std;
 
 //Forward decleration of our Window Interface
@@ -36,17 +39,26 @@ public:
 	virtual void render();
 	//virtual function, can be overriden
 	virtual void update();
+
+	virtual bool initGame();
+
+	void clearObjectList();
 private:
 	bool parseConfigFile();
 	bool initInput();
-	bool initGame();
+	
 	bool initGraphics();
 	bool initPhysics();
 
 	bool initWindow();
-private:
+protected:
+	typedef vector<GameObject*> GameObjectList;
+	typedef vector<GameObject*>::iterator GameObjectIter;
 	IWindow * m_pWindow;
 	IRenderer * m_pRenderer;
 	GameOptionsDesc m_GameOptionDesc;
 	wstring m_ConfigFileName;
+	GameObjectList m_GameObjectList;
+
+	
 };

@@ -6,18 +6,20 @@ bool CubeVisualComponent::create(IRenderer * pRenderer)
 {
 	
 	Vertex verts[]={
-		{-1.0f,-1.0f,0.0f},
-		{-1.0f,1.0f,0.0f},
-		{1.0f,-1.0f,0.0f},
-		{1.0f,1.0f,0.0f}
+		{-0.5f,-0.5f,0.0f},
+		{-0.5f,0.5f,0.0f},
+		{0.5f,-0.5f,0.0f},
+		{0.5f,0.5f,0.0f}
 	};
+	m_iNoVerts=4;
 
 	int indices[]={0,1,2,1,3,2};
+	m_iNoIndices=6;
 
 	D3D10Renderer *pD3D10Renderer=static_cast<D3D10Renderer*>(pRenderer);
 
-	m_pVertexBuffer=pD3D10Renderer->createVertexBuffer(4,verts);
-	m_pIndexBuffer=pD3D10Renderer->createIndexBuffer(6,indices);
+	m_pVertexBuffer=pD3D10Renderer->createVertexBuffer(m_iNoVerts,verts);
+	m_pIndexBuffer=pD3D10Renderer->createIndexBuffer(m_iNoIndices,indices);
 	
 
 	return true;

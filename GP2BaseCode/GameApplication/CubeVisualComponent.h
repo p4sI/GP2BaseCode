@@ -2,13 +2,9 @@
 
 class CubeVisualComponent:public VisualComponent
 {
+public:
 	CubeVisualComponent(){};
 	~CubeVisualComponent(){};
-
-	const goc_id_type& componentID()
-	{
-		return "CubeVisual";
-	};
 
 	bool create(IRenderer * pRenderer);
 };

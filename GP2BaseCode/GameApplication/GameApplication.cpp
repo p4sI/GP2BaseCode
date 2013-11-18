@@ -3,6 +3,7 @@
 //should really check to see if we are on a windows platform
 #include "../Window/Win32Window.h"
 #include "../D3D10Renderer/D3D10Renderer.h"
+#include "GameObject.h"
 
 //boost header for program options
 //#include <boost/program_options.hpp>
@@ -31,6 +32,7 @@ CGameApplication::CGameApplication(void)
 //Desconstructor
 CGameApplication::~CGameApplication(void)
 {
+	clearObjectList();
 	//Delete things in reverse order
 	if (m_pRenderer)
 	{
@@ -127,6 +129,10 @@ void CGameApplication::run()
 //Render, called to draw one frame of the game
 void CGameApplication::render()
 {
+	for(GameObjectIter iter=m_GameObjectList.begin();iter!=m_GameObjectList.end();++iter)
+	{
+		m_pRenderer->addToRenderQueue((*iter));
+	}
 	m_pRenderer->clear(1.0f,0.0f,0.0f,1.0f);
 	m_pRenderer->render();
 	m_pRenderer->present();
@@ -135,5 +141,27 @@ void CGameApplication::render()
 //Update, called to update the game
 void CGameApplication::update()
 {
+	for(GameObjectIter iter=m_GameObjectList.begin();iter!=m_GameObjectList.end();++iter)
+	{
+		(*iter)->update();
+	}
+}
+
+void CGameApplication::clearObjectList()
+{
+	//m_GameObjectList
+	GameObjectIter iter=m_GameObjectList.begin();
+	while(iter!=m_GameObjectList.end())
+	{
+		if (*iter)
+		{
+			delete (*iter);
+			iter=m_GameObjectList.erase(iter);
+		}
+		else
+		{
+			++iter;
+		}
+	}
 }
 

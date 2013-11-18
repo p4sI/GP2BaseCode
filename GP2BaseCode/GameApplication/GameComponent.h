@@ -18,11 +18,12 @@ public:
 
 	GameComponent(){
 		m_pOwnerGameObject=NULL;
+		m_Name="BaseComponent";
 	};
 
 	virtual ~GameComponent()=0{};
 
-	virtual const goc_id_type& componentID()=0;
+	virtual const goc_id_type& getName(){ return m_Name;};
 	
 	virtual void update(){};
 
@@ -36,6 +37,7 @@ public:
 		return m_pOwnerGameObject;
 	}
 
-private:
+protected:
 	GameObject *m_pOwnerGameObject;
+	goc_id_type m_Name;
 };

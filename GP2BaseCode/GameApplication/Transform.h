@@ -11,15 +11,18 @@ class Transform:public GameComponent
 public:
 	Transform()
 	{
+		m_vecPosition=XMFLOAT3(0.0f,0.0f,0.0f);
+		m_vecRotation=XMFLOAT3(0.0f,0.0f,0.0f);
+		m_vecScale=XMFLOAT3(0.0f,0.0f,0.0f);
+		m_matScale=XMMatrixIdentity();
+		m_matRotation=XMMatrixIdentity();
+		m_matTranslation=XMMatrixIdentity();
+		m_matWorld=XMMatrixIdentity();
+		m_Name="Transform";
 	};
 
 	~Transform()
 	{
-	}
-
-	const goc_id_type& componentID()
-	{
-		return "Transform";
 	};
 
 	void update()

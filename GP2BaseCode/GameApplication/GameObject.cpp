@@ -2,11 +2,13 @@
 
 void GameObject::addComponent(GameComponent* pComponent)
 {
+	const GameComponent::goc_id_type id=pComponent->getName();
 	//do we have a component?
-	if (m_Components.find(pComponent->componentID())==m_Components.end())
+	if (m_Components.find(id)==m_Components.end())
 	{
 		//not found, so add
-		m_Components[pComponent->componentID()]=pComponent;
+		pComponent->setOwner(this);
+		m_Components[id]=pComponent;
 	}
 	else
 	{

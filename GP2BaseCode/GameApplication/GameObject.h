@@ -12,7 +12,7 @@ class GameObject
 public:
 	GameObject()
 	{
-
+		m_Transform.setOwner(this);
 	};
 
 	~GameObject()

@@ -11,6 +11,7 @@
 
 #define _XM_NO_INTRINSICS_
 #include <xnamath.h>
+#include <queue>
 
 #include "Vertex.h"
 
@@ -33,20 +34,16 @@ public:
 
 	ID3D10Buffer * createVertexBuffer(int size,Vertex *pVerts);
 	ID3D10Buffer * createIndexBuffer(int size,int *pIndices);
+
+	void addToRenderQueue(GameObject *pObject);
 private:
 	bool createDevice(HWND pWindowHandle,int windowWidth, int windowHeight,
 bool fullScreen);
 	bool createInitialRenderTarget(int windowWidth, int windowHeight);
 
-	////temp for the exercise
-	//bool loadEffectFromMemory(const char *pMem);
-	//bool loadEffectFromFile(const char *pFilename);
-	//bool createBuffer();
 	bool createVertexLayout();
-	//void createCamera(XMVECTOR &position, XMVECTOR &focu,XMVECTOR &up,
-	//	float fov,float aspectRatio,float nearClip,float farClip);
-	//void setSquarePosition(float x,float y,float z);
 private:
+	typedef std::queue<GameObject*> RenderQueue;
 	//D3D10 stuff
 	ID3D10Device * m_pD3D10Device;
 	IDXGISwapChain * m_pSwapChain;
@@ -58,9 +55,12 @@ private:
 	ID3D10InputLayout*      m_pDefaultVertexLayout;
 	//this will be used if we have no Effect
 	ID3D10Effect * m_pDefaultEffect;
+	ID3D10EffectTechnique * m_pDefaultTechnique;
 
 	//Effect Variables
 	ID3D10EffectMatrixVariable * m_pWorldEffectVariable;
 	ID3D10EffectMatrixVariable * m_pProjectionEffectVariable;
 	ID3D10EffectMatrixVariable * m_pViewEffectVariable;
+
+	RenderQueue m_RenderQueue;
 };

@@ -11,16 +11,11 @@ class Material:public GameComponent
 public:
 	Material()
 	{
+		m_Name="Material";
 	};
 
 	~Material()
 	{
-	};
-
-
-	const goc_id_type& componentID()
-	{
-		return "Material";
 	};
 
 	void setAmbient(float r,float g,float b,float a)

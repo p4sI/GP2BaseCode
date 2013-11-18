@@ -13,6 +13,9 @@ public:
 	{
 		m_pVertexBuffer=NULL;
 		m_pIndexBuffer=NULL;
+		m_iNoIndices=0;
+		m_iNoVerts=0;
+		m_Name="Visual";
 	};
 	
 	virtual ~VisualComponent()
@@ -27,16 +30,23 @@ public:
 		}
 	};
 
-	virtual const goc_id_type& componentID()
-	{
-		return "Visual";
-	};
-
 	virtual bool create(IRenderer * pRenderer){return true;};
 
 	ID3D10Buffer* getVertexBuffer(){return m_pVertexBuffer;};
 	ID3D10Buffer* getIndexBuffer(){return m_pIndexBuffer;};
+	
+	int getNoIndices()
+	{
+		return m_iNoIndices;
+	};
+
+	int getNoVerts()
+	{
+		return m_iNoVerts;
+	};
 protected:
 	ID3D10Buffer * m_pVertexBuffer;
 	ID3D10Buffer * m_pIndexBuffer;
+	int m_iNoIndices;
+	int m_iNoVerts;
 };
