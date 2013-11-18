@@ -17,8 +17,11 @@ public:
 	{
 	}
 
-.
-	
+	const goc_id_type& componentID()
+	{
+		return "Transform";
+	};
+
 	void update()
 	{
 		m_matScale=XMMatrixScaling(m_vecScale.x,m_vecScale.y,m_vecScale.z);

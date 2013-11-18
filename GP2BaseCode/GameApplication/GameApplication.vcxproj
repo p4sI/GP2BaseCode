@@ -80,13 +80,16 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CubeVisualComponent.h" />
     <ClInclude Include="GameApplication.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="VisualComponent.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CubeVisualComponent.cpp" />
     <ClCompile Include="GameApplication.cpp" />
     <ClCompile Include="GameObject.cpp" />
   </ItemGroup>

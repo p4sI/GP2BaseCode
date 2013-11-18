@@ -1,6 +1,6 @@
 //Components needed
 // Transform - Done
-// Material -
+// Material - Doneish!
 // Visual - 
 // Camera -
 // Directional Light - 

@@ -12,6 +12,8 @@
 #define _XM_NO_INTRINSICS_
 #include <xnamath.h>
 
+#include "Vertex.h"
+
 
 //D3D10Renderer implements the Renderer interface
 class D3D10Renderer:public IRenderer
@@ -28,6 +30,9 @@ public:
 
 	ID3D10Effect * loadEffectFromMemory(const char *pMem);
 	ID3D10Effect * loadEffectFromFile(const char *pFilename);
+
+	ID3D10Buffer * createVertexBuffer(int size,Vertex *pVerts);
+	ID3D10Buffer * createIndexBuffer(int size,int *pIndices);
 private:
 	bool createDevice(HWND pWindowHandle,int windowWidth, int windowHeight,
 bool fullScreen);
