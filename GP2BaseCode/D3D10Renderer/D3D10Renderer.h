@@ -57,10 +57,5 @@ private:
 	ID3D10Effect * m_pDefaultEffect;
 	ID3D10EffectTechnique * m_pDefaultTechnique;
 
-	//Effect Variables
-	ID3D10EffectMatrixVariable * m_pWorldEffectVariable;
-	ID3D10EffectMatrixVariable * m_pProjectionEffectVariable;
-	ID3D10EffectMatrixVariable * m_pViewEffectVariable;
-
 	RenderQueue m_RenderQueue;
 };

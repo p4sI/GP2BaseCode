@@ -29,7 +29,7 @@ void GameObject::clearComponents()
 		}
 		else
 		{
-			++iter;
+			iter++;
 		}
 	}
 
@@ -38,7 +38,8 @@ void GameObject::clearComponents()
 
 void GameObject::update()
 {
-	for(ComponentTableIter iter=m_Components.begin();iter!=m_Components.end();++iter)
+	m_Transform.update();
+	for(ComponentTableIter iter=m_Components.begin();iter!=m_Components.end();iter++)
 	{
 		GameComponent *pCurrentComponent=(*iter).second;
 		if (pCurrentComponent)

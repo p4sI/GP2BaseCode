@@ -25,7 +25,8 @@ public:
 		m_Name=name;
 	};
 
-	const Transform& getTransfrom()
+	Transform& getTransfrom()
+
 	{
 		return m_Transform;
 	};

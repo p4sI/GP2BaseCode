@@ -4,14 +4,13 @@
 
 bool CubeVisualComponent::create(IRenderer * pRenderer)
 {
-	
-	Vertex verts[]={
-		{-0.5f,-0.5f,0.0f},
-		{-0.5f,0.5f,0.0f},
-		{0.5f,-0.5f,0.0f},
-		{0.5f,0.5f,0.0f}
-	};
 	m_iNoVerts=4;
+	Vertex verts[4];
+	verts[0].position=XMFLOAT3(-0.5f,-0.5f,0.0f);
+	verts[1].position=XMFLOAT3(-0.5f,0.5f,0.0f);
+	verts[2].position=XMFLOAT3(0.5f,-0.5f,0.0f);
+	verts[3].position=XMFLOAT3(0.5f,0.5f,0.0f);
+
 
 	int indices[]={0,1,2,1,3,2};
 	m_iNoIndices=6;

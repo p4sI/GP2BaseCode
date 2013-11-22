@@ -1,6 +1,6 @@
 #include "D3D10Renderer.h"
 #include "../GameApplication/GameObject.h"
-#include "../GameApplication/VisualComponent.h"
+#include "../GameApplication/Components.h"
 
 // Define the input layout of the vertex, this is so we can bind a vertex to the pipeline - BMD
 const D3D10_INPUT_ELEMENT_DESC VerexLayout[] =
@@ -12,7 +12,7 @@ const D3D10_INPUT_ELEMENT_DESC VerexLayout[] =
 	0, //Offset, this will increase as we add more elements(such texture coords) to the layout - BMD
 	D3D10_INPUT_PER_VERTEX_DATA, //Input classification - BMD
 	0 }, //Instance Data slot - BMD
-	/*
+	
     { "TEXCOORD", //Name of the semantic, this helps to bind the vertex inside the Vertex Shader - BMD
 	0, //The index of the semantic, see above - BMD
 	DXGI_FORMAT_R32G32_FLOAT, //The format of the element, in this case 32 bits of each sub element - BMD
@@ -27,7 +27,7 @@ const D3D10_INPUT_ELEMENT_DESC VerexLayout[] =
 	0, //Input slot - BMD
 	20, //Offset, this will increase as we add more elements(such texture coords) to the layout - BMD
 	D3D10_INPUT_PER_VERTEX_DATA, //Input classification - BMD
-	0 }, //Instance Data slot - BMD*/
+	0 }, //Instance Data slot - BMD
 };
 
 const char basicEffect[]=\
@@ -245,11 +245,18 @@ void D3D10Renderer::clear(float r,float g,float b,float a)
 
 void D3D10Renderer::render()
 {
-	//Set the type of primitive
 	int noIndices=0;
 	int noVerts=0;
 	ID3D10Buffer *pIndexBuffer=NULL;
 	ID3D10Buffer *pVertexBuffer=NULL;
+	ID3D10Effect *pCurrentEffect=m_pDefaultEffect;
+	ID3D10EffectTechnique *pCurrentTechnique=m_pDefaultTechnique;
+
+	XMFLOAT3 cameraPos=XMFLOAT3(0.0f,0.0f,-10.0f);
+	XMFLOAT3 focusPos=XMFLOAT3(0.0f,0.0f,0.0f);
+	XMFLOAT3 up=XMFLOAT3(0.0f,1.0f,0.0f);
+	XMMATRIX view=XMMatrixLookAtLH(XMLoadFloat3(&cameraPos),XMLoadFloat3(&focusPos),XMLoadFloat3(&up));
+	XMMATRIX projection=XMMatrixPerspectiveFovLH(XM_PI/4,800.0f/640.0f,0.1f,100.0f);
 
 	m_pD3D10Device->IASetPrimitiveTopology( D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP );
 	m_pD3D10Device->IASetInputLayout(m_pDefaultVertexLayout);
@@ -288,14 +295,43 @@ void D3D10Renderer::render()
 			}
 
 
-			//Do we have an Effect?
+			//Do we have an Effect? If we don't then use default
+			Material *pMaterial=static_cast<Material*>(pObject->getComponent("Material"));
+			if (pMaterial)
+			{
+				if (pMaterial->getEffect())
+				{
+					pCurrentEffect=pMaterial->getEffect();
+				}
+				if (pMaterial->getCurrentTechnique())
+				{
+					pCurrentTechnique=pMaterial->getCurrentTechnique();
+				}
 
+				//Retrieve & send material stuff
+			}
+
+			ID3D10EffectMatrixVariable * pWorldMatrixVar=pCurrentEffect->GetConstantBufferByName("matWorld")->AsMatrix();
+			ID3D10EffectMatrixVariable * pViewMatrixVar=pCurrentEffect->GetConstantBufferByName("matView")->AsMatrix();
+			ID3D10EffectMatrixVariable * pProjectionMatrixVar=pCurrentEffect->GetConstantBufferByName("matProjection")->AsMatrix();
+			if (pWorldMatrixVar)
+			{
+				pWorldMatrixVar->SetMatrix((float*)&transform.getWorld());
+			}
+			if (pViewMatrixVar)
+			{
+				pViewMatrixVar->SetMatrix((float*)&view);
+			}
+			if (pProjectionMatrixVar)
+			{
+				pProjectionMatrixVar->SetMatrix((float*)&projection);
+			}
 			D3D10_TECHNIQUE_DESC techniqueDesc;
-			m_pDefaultTechnique->GetDesc(&techniqueDesc);
+			pCurrentTechnique->GetDesc(&techniqueDesc); 
 
 			for (unsigned int i=0;i<techniqueDesc.Passes;++i)
 			{
-				ID3D10EffectPass *pCurrentPass=m_pDefaultTechnique->GetPassByIndex(i);
+				ID3D10EffectPass *pCurrentPass=pCurrentTechnique->GetPassByIndex(i);
 				pCurrentPass->Apply(0);
 
 				if (pIndexBuffer)
@@ -308,10 +344,6 @@ void D3D10Renderer::render()
 
 		m_RenderQueue.pop();
 	}
-	////Send variables
-	//m_pWorldEffectVariable->SetMatrix((float*)&m_World);
-	//m_pProjectionEffectVariable->SetMatrix((float*)&m_Projection);
-	//m_pViewEffectVariable->SetMatrix((float*)&m_View);
 }
 
 void D3D10Renderer::present()
@@ -385,12 +417,6 @@ ID3D10Effect * D3D10Renderer::loadEffectFromFile(const char *pFilename)
 		OutputDebugStringA((char*)pErrorBuffer->GetBufferPointer());
 		return NULL;
 	}
-
-	//m_pTempTechnique=m_pTempEffect->GetTechniqueByName("Render");
-
-	m_pWorldEffectVariable=pEffect->GetVariableByName("matWorld")->AsMatrix();
-	m_pProjectionEffectVariable=pEffect->GetVariableByName("matProjection")->AsMatrix();
-	m_pViewEffectVariable=pEffect->GetVariableByName("matView")->AsMatrix();
 
 	return pEffect;
 }

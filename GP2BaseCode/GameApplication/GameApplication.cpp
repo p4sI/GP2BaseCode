@@ -133,6 +133,7 @@ void CGameApplication::render()
 	{
 		m_pRenderer->addToRenderQueue((*iter));
 	}
+
 	m_pRenderer->clear(1.0f,0.0f,0.0f,1.0f);
 	m_pRenderer->render();
 	m_pRenderer->present();
@@ -141,7 +142,7 @@ void CGameApplication::render()
 //Update, called to update the game
 void CGameApplication::update()
 {
-	for(GameObjectIter iter=m_GameObjectList.begin();iter!=m_GameObjectList.end();++iter)
+	for(GameObjectIter iter=m_GameObjectList.begin();iter!=m_GameObjectList.end();iter++)
 	{
 		(*iter)->update();
 	}

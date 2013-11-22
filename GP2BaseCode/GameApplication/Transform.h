@@ -13,7 +13,7 @@ public:
 	{
 		m_vecPosition=XMFLOAT3(0.0f,0.0f,0.0f);
 		m_vecRotation=XMFLOAT3(0.0f,0.0f,0.0f);
-		m_vecScale=XMFLOAT3(0.0f,0.0f,0.0f);
+		m_vecScale=XMFLOAT3(1.0f,1.0f,1.0f);
 		m_matScale=XMMatrixIdentity();
 		m_matRotation=XMMatrixIdentity();
 		m_matTranslation=XMMatrixIdentity();
