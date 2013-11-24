@@ -243,7 +243,7 @@ void D3D10Renderer::render()
 			//Grab Transform
 			Transform transform=pObject->getTransfrom();
 
-			//Now grab Visual?
+			//Now grab Visual Component
 			VisualComponent *pVisualComponent=static_cast<VisualComponent *>(pObject->getComponent("Visual"));
 			if (pVisualComponent)
 			{
@@ -291,12 +291,13 @@ void D3D10Renderer::render()
 				//Retrieve & send material stuff
 			}
 
-			ID3D10EffectMatrixVariable * pWorldMatrixVar=pCurrentEffect->GetConstantBufferByName("matWorld")->AsMatrix();
-			ID3D10EffectMatrixVariable * pViewMatrixVar=pCurrentEffect->GetConstantBufferByName("matView")->AsMatrix();
-			ID3D10EffectMatrixVariable * pProjectionMatrixVar=pCurrentEffect->GetConstantBufferByName("matProjection")->AsMatrix();
+			ID3D10EffectMatrixVariable * pWorldMatrixVar=pCurrentEffect->GetVariableByName("matWorld")->AsMatrix();
+			ID3D10EffectMatrixVariable * pViewMatrixVar=pCurrentEffect->GetVariableByName("matView")->AsMatrix();
+			ID3D10EffectMatrixVariable * pProjectionMatrixVar=pCurrentEffect->GetVariableByName("matProjection")->AsMatrix();
+
 			if (pWorldMatrixVar)
 			{
-				pWorldMatrixVar->SetMatrix((float*)&world);
+				pWorldMatrixVar->SetMatrix((float*)&transform.getWorld());
 			}
 			if (pViewMatrixVar)
 			{
@@ -306,6 +307,7 @@ void D3D10Renderer::render()
 			{
 				pProjectionMatrixVar->SetMatrix((float*)&projection);
 			}
+
 			D3D10_TECHNIQUE_DESC techniqueDesc;
 			pCurrentTechnique->GetDesc(&techniqueDesc); 
 
