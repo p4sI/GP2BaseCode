@@ -34,14 +34,13 @@ public:
 
 	ID3D10Buffer * createVertexBuffer(int size,Vertex *pVerts);
 	ID3D10Buffer * createIndexBuffer(int size,int *pIndices);
+	ID3D10InputLayout * createVertexLayout(ID3D10Effect * pEffect);
 
 	void addToRenderQueue(GameObject *pObject);
 private:
 	bool createDevice(HWND pWindowHandle,int windowWidth, int windowHeight,
 bool fullScreen);
 	bool createInitialRenderTarget(int windowWidth, int windowHeight);
-
-	bool createVertexLayout();
 private:
 	typedef std::queue<GameObject*> RenderQueue;
 	//D3D10 stuff

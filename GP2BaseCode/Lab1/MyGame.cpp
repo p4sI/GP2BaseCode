@@ -8,13 +8,13 @@ bool MyGame::initGame()
 	Material *pMaterial=new Material();
 	pMaterial->loadEffect("Effects/Transform.fx",m_pRenderer);
 
-
 	GameObject *pTestObj=new GameObject();
 	pTestObj->setName("TestObject");
 	pTestObj->addComponent(pCube);
 	pTestObj->addComponent(pMaterial);
 
-	//pTestObj->getTransfrom().setPosition(0.0f,0.0f,0.0f);
+	pCube->createVertexLayout(m_pRenderer);
+
 	m_GameObjectList.push_back(pTestObj);
 
 	return true;

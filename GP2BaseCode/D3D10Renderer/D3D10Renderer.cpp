@@ -102,17 +102,8 @@ bool D3D10Renderer::init(void *pWindowHandle,bool fullScreen)
 		return false;
 	}
 	m_pDefaultTechnique=m_pDefaultEffect->GetTechniqueByIndex(0);
+	m_pDefaultVertexLayout=createVertexLayout(m_pDefaultEffect);
 
-	if(!createVertexLayout())
-	{
-		return false;
-	}
-	//XMFLOAT3 cameraPos=XMFLOAT3(0.0f,0.0f,-10.0f);
-	//XMFLOAT3 focusPos=XMFLOAT3(0.0f,0.0f,0.0f);
-	//XMFLOAT3 up=XMFLOAT3(0.0f,1.0f,0.0f);
-	////Calculate World View
-	//createCamera(XMLoadFloat3(&cameraPos),XMLoadFloat3(&focusPos),XMLoadFloat3(&up),
-	//	XM_PI/4,(float)width/(float)height,0.1f,100.0f);
 	return true;
 }
 
@@ -213,25 +204,6 @@ bool D3D10Renderer::createInitialRenderTarget(int windowWidth, int windowHeight)
 	return true;
 }
 
-bool D3D10Renderer::createVertexLayout()
-{
-	//Number of elements in the layout - BMD
-    UINT numElements = sizeof( VerexLayout ) / sizeof(D3D10_INPUT_ELEMENT_DESC);
-	//Get the Pass description, we need this to bind the vertex to the pipeline - BMD
-    D3D10_PASS_DESC PassDesc;
-	m_pDefaultEffect->GetTechniqueByIndex(0)->GetPassByIndex(0)->GetDesc(&PassDesc);
-	//Create Input layout to describe the incoming buffer to the input assembler - BMD
-    if (FAILED(m_pD3D10Device->CreateInputLayout( VerexLayout, //The layout describing our vertices - BMD
-		numElements, //The number of elements in the layout
-		PassDesc.pIAInputSignature,//Input signature of the description of the pass - BMD
-        PassDesc.IAInputSignatureSize, //The size of this Signature size of the pass - BMD
-		&m_pDefaultVertexLayout ))) //The pointer to an address of Vertex Layout - BMD
-	{
-		OutputDebugStringA("Can't create layout");
-	}
-	return true;
-}
-
 void D3D10Renderer::clear(float r,float g,float b,float a)
 {
     // Just clear the backbuffer, colours start at 0.0 to 1.0
@@ -251,15 +223,17 @@ void D3D10Renderer::render()
 	ID3D10Buffer *pVertexBuffer=NULL;
 	ID3D10Effect *pCurrentEffect=m_pDefaultEffect;
 	ID3D10EffectTechnique *pCurrentTechnique=m_pDefaultTechnique;
+	ID3D10InputLayout *pCurrentLayout=m_pDefaultVertexLayout;
 
 	XMFLOAT3 cameraPos=XMFLOAT3(0.0f,0.0f,-10.0f);
 	XMFLOAT3 focusPos=XMFLOAT3(0.0f,0.0f,0.0f);
 	XMFLOAT3 up=XMFLOAT3(0.0f,1.0f,0.0f);
 	XMMATRIX view=XMMatrixLookAtLH(XMLoadFloat3(&cameraPos),XMLoadFloat3(&focusPos),XMLoadFloat3(&up));
 	XMMATRIX projection=XMMatrixPerspectiveFovLH(XM_PI/4,800.0f/640.0f,0.1f,100.0f);
+	XMMATRIX world=XMMatrixIdentity();
 
 	m_pD3D10Device->IASetPrimitiveTopology( D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP );
-	m_pD3D10Device->IASetInputLayout(m_pDefaultVertexLayout);
+	
 
 	while(!m_RenderQueue.empty())
 	{
@@ -292,7 +266,14 @@ void D3D10Renderer::render()
 					&pVertexBuffer, //A pointer to an array of vertex buffers - BMD
 					&stride, //Pointer to an array of strides of vertices in the buffer - BMD
 					&offset );//Pointer to an array of offsets to the vertices in the vertex buffers - BMD
+
+				if (pVisualComponent->getVertexLayout())
+				{
+					pCurrentLayout=pVisualComponent->getVertexLayout();
+				}
 			}
+
+			m_pD3D10Device->IASetInputLayout(pCurrentLayout);
 
 
 			//Do we have an Effect? If we don't then use default
@@ -307,7 +288,6 @@ void D3D10Renderer::render()
 				{
 					pCurrentTechnique=pMaterial->getCurrentTechnique();
 				}
-
 				//Retrieve & send material stuff
 			}
 
@@ -316,7 +296,7 @@ void D3D10Renderer::render()
 			ID3D10EffectMatrixVariable * pProjectionMatrixVar=pCurrentEffect->GetConstantBufferByName("matProjection")->AsMatrix();
 			if (pWorldMatrixVar)
 			{
-				pWorldMatrixVar->SetMatrix((float*)&transform.getWorld());
+				pWorldMatrixVar->SetMatrix((float*)&world);
 			}
 			if (pViewMatrixVar)
 			{
@@ -484,6 +464,29 @@ ID3D10Buffer * D3D10Renderer::createIndexBuffer(int size,int *pIndices)
 
 	return pBuffer;
 }
+
+ID3D10InputLayout * D3D10Renderer::createVertexLayout(ID3D10Effect * pEffect)
+{
+	ID3D10InputLayout*      pVertexLayout=NULL;
+
+	//Number of elements in the layout - BMD
+    UINT numElements = sizeof( VerexLayout ) / sizeof(D3D10_INPUT_ELEMENT_DESC);
+	//Get the Pass description, we need this to bind the vertex to the pipeline - BMD
+    D3D10_PASS_DESC PassDesc;
+	pEffect->GetTechniqueByIndex(0)->GetPassByIndex(0)->GetDesc(&PassDesc);
+	//Create Input layout to describe the incoming buffer to the input assembler - BMD
+    if (FAILED(m_pD3D10Device->CreateInputLayout( VerexLayout, //The layout describing our vertices - BMD
+		numElements, //The number of elements in the layout
+		PassDesc.pIAInputSignature,//Input signature of the description of the pass - BMD
+        PassDesc.IAInputSignatureSize, //The size of this Signature size of the pass - BMD
+		&pVertexLayout ))) //The pointer to an address of Vertex Layout - BMD
+	{
+		OutputDebugStringA("Can't create layout");
+	}
+
+	return pVertexLayout;
+}
+
 
 void D3D10Renderer::addToRenderQueue(GameObject *pObject)
 {
