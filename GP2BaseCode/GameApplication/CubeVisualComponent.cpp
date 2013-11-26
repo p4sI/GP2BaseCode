@@ -12,6 +12,7 @@ bool CubeVisualComponent::create(IRenderer * pRenderer)
 	verts[3].position=XMFLOAT3(0.5f,0.5f,0.0f);
 
 
+
 	int indices[]={0,1,2,1,3,2};
 	m_iNoIndices=6;
 
