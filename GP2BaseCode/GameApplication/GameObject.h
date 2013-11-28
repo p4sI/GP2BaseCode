@@ -25,7 +25,7 @@ public:
 		m_Name=name;
 	};
 
-	Transform& getTransfrom()
+	Transform& getTransform()
 
 	{
 		return m_Transform;

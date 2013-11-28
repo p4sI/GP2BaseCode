@@ -27,6 +27,7 @@ CGameApplication::CGameApplication(void)
 	m_GameOptionDesc.fullscreen=false;
 	//Config options
 	m_ConfigFileName=TEXT("game.cfg");
+	m_pMainCamera=NULL;
 }
 
 //Desconstructor
@@ -129,6 +130,12 @@ void CGameApplication::run()
 //Render, called to draw one frame of the game
 void CGameApplication::render()
 {
+	if (m_pMainCamera)
+	{
+		D3D10Renderer * pD3D10Renderer=static_cast<D3D10Renderer*>(m_pRenderer);
+		pD3D10Renderer->setProjection(m_pMainCamera->getProjection());
+		pD3D10Renderer->setView(m_pMainCamera->getView());
+	}
 	for(GameObjectIter iter=m_GameObjectList.begin();iter!=m_GameObjectList.end();++iter)
 	{
 		m_pRenderer->addToRenderQueue((*iter));
