@@ -19,7 +19,7 @@ public:
 		m_FOV=XM_PI/4;
 		m_AspectRatio=800.0f/640.0f;
 		m_Near=0.1f;
-		m_Far=100.0f;
+		m_Far=1000.0f;
 	};
 
 	~CameraComponent()
