@@ -23,7 +23,8 @@ bool MyGame::initGame()
 	pCube->create(m_pRenderer);
 	
 	pMaterial=new Material();
-	pMaterial->loadEffect("Effects/Transform.fx",m_pRenderer);
+	pMaterial->loadEffect("Effects/Texture.fx",m_pRenderer);
+	pMaterial->loadDiffuseTexture("Textures/Spotlight.jpg",m_pRenderer);
 
 	pTestObj=new GameObject();
 	pTestObj->setName("TestObject1");

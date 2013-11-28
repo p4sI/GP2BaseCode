@@ -283,7 +283,35 @@ void D3D10Renderer::render()
 				{
 					pCurrentTechnique=pMaterial->getCurrentTechnique();
 				}
+				if (pMaterial->getDiffuseTexture())
+				{
+					ID3D10EffectShaderResourceVariable * pDiffuseTextureVar=pCurrentEffect->GetVariableByName("diffuseTexture")->AsShaderResource();
+					pDiffuseTextureVar->SetResource(pMaterial->getDiffuseTexture());
+				}
+
+				if (pMaterial->getSpecularTexture())
+				{
+					ID3D10EffectShaderResourceVariable * pSpecularTextureVar=pCurrentEffect->GetVariableByName("specularTexture")->AsShaderResource();
+					pSpecularTextureVar->SetResource(pMaterial->getSpecularTexture());
+				}
 				//Retrieve & send material stuff
+
+				ID3D10EffectVectorVariable *pAmbientMatVar=pCurrentEffect->GetVariableByName("ambientMaterial")->AsVector();
+				ID3D10EffectVectorVariable *pDiffuseMatVar=pCurrentEffect->GetVariableByName("diffuseMaterial")->AsVector();
+				ID3D10EffectVectorVariable *pSpecularMatVar=pCurrentEffect->GetVariableByName("specularMaterial")->AsVector();
+
+				if (pAmbientMatVar)
+				{
+					pAmbientMatVar->SetFloatVector((float*)&pMaterial->getAmbient());
+				}
+				if (pDiffuseMatVar)
+				{
+					pDiffuseMatVar->SetFloatVector((float*)&pMaterial->getDiffuse());
+				}
+				if (pSpecularMatVar)
+				{
+					pSpecularMatVar->SetFloatVector((float*)&pMaterial->getSpecular());
+				}
 			}
 
 			XMFLOAT3 cameraPos=XMFLOAT3(0.0f,0.0f,-50.0f);
@@ -491,6 +519,17 @@ ID3D10InputLayout * D3D10Renderer::createVertexLayout(ID3D10Effect * pEffect)
 	return pVertexLayout;
 }
 
+ID3D10ShaderResourceView * D3D10Renderer::loadTexture(const char *pFilename)
+{
+	ID3D10ShaderResourceView * pTexture=NULL;
+
+	if (FAILED(D3DX10CreateShaderResourceViewFromFileA(m_pD3D10Device,pFilename,NULL,NULL,&pTexture,NULL)))
+	{
+		return pTexture;
+	}
+
+	return pTexture;
+}
 
 void D3D10Renderer::addToRenderQueue(GameObject *pObject)
 {

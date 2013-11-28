@@ -35,6 +35,8 @@ public:
 	ID3D10Buffer * createVertexBuffer(int size,Vertex *pVerts);
 	ID3D10Buffer * createIndexBuffer(int size,int *pIndices);
 	ID3D10InputLayout * createVertexLayout(ID3D10Effect * pEffect);
+
+	ID3D10ShaderResourceView * loadTexture(const char *pFilename);
 	void addToRenderQueue(GameObject *pObject);
 
 	void setProjection(XMMATRIX& projection)

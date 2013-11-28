@@ -6,7 +6,7 @@
 #define _XM_NO_INTRINSICS_
 #include <xnamath.h>
 
-#include "D3D10.h"
+#include <D3D10.h>
 #include "../Renderer/Renderer.h"
 
 #include <string>
@@ -24,10 +24,22 @@ public:
 		m_Ambient=XMCOLOR(0.3f,0.3f,0.3f,1.0f);
 		m_Diffuse=XMCOLOR(0.5f,0.5f,0.5f,1.0f);
 		m_Specular=XMCOLOR(1.0f,1.0f,1.0f,1.0f);
+		m_pDiffuseTexture=NULL;
+		m_pSpecularTexture=NULL;
 	};
 
 	~Material()
 	{
+		if (m_pDiffuseTexture)
+		{
+			m_pDiffuseTexture->Release();
+			m_pDiffuseTexture=NULL;
+		}
+		if (m_pSpecularTexture)
+		{
+			m_pSpecularTexture->Release();
+			m_pSpecularTexture=NULL;
+		}
 		if (m_pEffect)
 		{
 			m_pEffect->Release();
@@ -77,10 +89,25 @@ public:
 	{
 		return m_pCurrentTechnique;
 	};
+
+	bool loadDiffuseTexture(const string& filename,IRenderer *pRenderer);
+	bool loadSpecularTexture(const string& filename,IRenderer *pRenderer);
+
+	ID3D10ShaderResourceView * getDiffuseTexture()
+	{
+		return m_pDiffuseTexture;
+	};
+
+	ID3D10ShaderResourceView * getSpecularTexture()
+	{
+		return m_pSpecularTexture;
+	};
 private:
 	XMCOLOR m_Ambient;
 	XMCOLOR m_Diffuse;
 	XMCOLOR m_Specular;
 	ID3D10Effect *m_pEffect;
 	ID3D10EffectTechnique *m_pCurrentTechnique;
+	ID3D10ShaderResourceView * m_pDiffuseTexture;
+	ID3D10ShaderResourceView * m_pSpecularTexture;
 };
