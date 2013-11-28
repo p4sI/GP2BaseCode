@@ -8,14 +8,35 @@ bool CubeVisualComponent::create(IRenderer * pRenderer)
 	Vertex verts[8];
 	verts[0].position=XMFLOAT3(-0.5f,-0.5f,0.5f);
 	verts[0].normal=XMFLOAT3(-0.25f,-0.25f,0.5f);
-	verts[1].position=XMFLOAT3(-0.5f,0.5f,0.5f);
-	verts[2].position=XMFLOAT3(0.5f,-0.5f,0.5f);
-	verts[3].position=XMFLOAT3(0.5f,0.5f,0.5f);
-	verts[4].position=XMFLOAT3(-0.5f,-0.5f,-0.5f);
-	verts[5].position=XMFLOAT3(-0.5f,0.5f,-0.5f);
-	verts[6].position=XMFLOAT3(0.5f,-0.5f,-0.5f);
-	verts[7].position=XMFLOAT3(0.5f,0.5f,-0.5f);
+	verts[0].textureCoords=XMFLOAT2(0.0f,1.0f);
 
+	verts[1].position=XMFLOAT3(-0.5f,0.5f,0.5f);
+	verts[1].normal=XMFLOAT3(-0.25f,0.25f,0.5f);
+	verts[1].textureCoords=XMFLOAT2(0.0f,0.0f);
+	
+	verts[2].position=XMFLOAT3(0.5f,-0.5f,0.5f);
+	verts[2].normal=XMFLOAT3(0.25f,-0.25f,0.5f);
+	verts[2].textureCoords=XMFLOAT2(1.0f,1.0f);
+
+	verts[3].position=XMFLOAT3(0.5f,0.5f,0.5f);
+	verts[3].normal=XMFLOAT3(0.25f,0.25f,0.5f);
+	verts[3].textureCoords=XMFLOAT2(1.0f,0.0f);
+	
+	verts[4].position=XMFLOAT3(-0.5f,-0.5f,-0.5f);
+	verts[4].normal=XMFLOAT3(-0.25f,-0.25f,-0.5f);
+	verts[4].textureCoords=XMFLOAT2(0.0f,1.0f);
+	
+	verts[5].position=XMFLOAT3(-0.5f,0.5f,-0.5f);
+	verts[5].normal=XMFLOAT3(-0.25f,0.25f,-0.5f);
+	verts[5].textureCoords=XMFLOAT2(0.0f,0.0f);
+
+	verts[6].position=XMFLOAT3(0.5f,-0.5f,-0.5f);
+	verts[6].normal=XMFLOAT3(0.25f,-0.25f,-0.5f);
+	verts[6].textureCoords=XMFLOAT2(1.0f,1.0f);
+	
+	verts[7].position=XMFLOAT3(0.5f,0.5f,-0.5f);
+	verts[7].normal=XMFLOAT3(0.25f,0.25f,-0.5f);
+	verts[7].textureCoords=XMFLOAT2(1.0f,0.0f);
 
 
 	int indices[]={0,1,2,1,3,2,		//front 
