@@ -12,9 +12,9 @@
 #define _XM_NO_INTRINSICS_
 #include <xnamath.h>
 #include <queue>
+#include <vector>
 
 #include "Vertex.h"
-
 
 //D3D10Renderer implements the Renderer interface
 class D3D10Renderer:public IRenderer
@@ -48,12 +48,19 @@ public:
 	{
 		m_View=view;
 	};
+
+	void setAmbientLightColour(float r,float g,float b,float a)
+	{
+		m_AmbientLightColour=XMCOLOR(r,g,b,a);
+	};
+
 private:
 	bool createDevice(HWND pWindowHandle,int windowWidth, int windowHeight,
 bool fullScreen);
 	bool createInitialRenderTarget(int windowWidth, int windowHeight);
 private:
 	typedef std::queue<GameObject*> RenderQueue;
+	
 	//D3D10 stuff
 	ID3D10Device * m_pD3D10Device;
 	IDXGISwapChain * m_pSwapChain;
@@ -71,4 +78,9 @@ private:
 
 	XMMATRIX m_View;
 	XMMATRIX m_Projection;
+
+	XMCOLOR m_AmbientLightColour;
+
+	GameObject * m_pMainCamera;
+	GameObject * m_pMainLight;
 };

@@ -26,11 +26,11 @@ float4 lightDirection:DIRECTION<
 
 float4 diffuseLightColour:DIFFUSE<
 	string Object = "DirectionalLight";
->;
+> =float4(1.0f,1.0f,1.0f,1.0f);
 
 float4 specularLightColour:SPECULAR<
 	string Object = "DirectionalLight";
->;
+> =float4(1.0f,1.0f,1.0f,1.0f);
 
 float specularPower<
 	string UIName="Specular Power";
@@ -57,8 +57,8 @@ SamplerState wrapSampler
 struct VS_INPUT
 {
 	float4 pos:POSITION;
-	float3 normal:NORMAL;
 	float2 texCoord:TEXCOORD;
+	float3 normal:NORMAL;
 };
 
 struct PS_INPUT
@@ -94,15 +94,15 @@ float4 PS(PS_INPUT input):SV_TARGET
 	float3 normal=input.normal;	
 	float3 lightDir=normalize(input.lightDir);
 	
-	float4 diffuseColour=diffuseMaterial*diffuseTexture.Sample(wrapSampler,input.texCoord);
-	float4 specularColour=specularMaterial*specularTexture.Sample(wrapSampler,input.texCoord);
+	float4 diffuseColour=diffuseMaterial;
+	float4 specularColour=specularMaterial;
 		
 	float diffuse=saturate(dot(normal,lightDir));
 	
 	float3 halfVec=normalize(lightDir+input.cameraDirection);
 	float specular=pow(saturate(dot(normal,halfVec)),specularPower);
 	
-	return ((ambientMaterialColour*ambientLightColour)+
+	return ((ambientMaterial*ambientLightColour)+
 	(diffuseColour*diffuseLightColour*diffuse)+
 	(specularColour*specularLightColour*specular));
 }

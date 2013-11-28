@@ -6,18 +6,24 @@ bool MyGame::initGame()
 	pCube->create(m_pRenderer);
 	
 	Material *pMaterial=new Material();
-	pMaterial->loadEffect("Effects/Transform.fx",m_pRenderer);
+	pMaterial->loadEffect("Effects/DirectionalLight.fx",m_pRenderer);
+
+	DirectionalLight *pDirLight=new DirectionalLight();
 
 	GameObject *pTestObj=new GameObject();
 	pTestObj->setName("TestObject");
 	pTestObj->addComponent(pCube);
 	pTestObj->addComponent(pMaterial);
+	pTestObj->addComponent(pDirLight);
 
 	pCube->createVertexLayout(m_pRenderer);
 	
 	pTestObj->getTransform().setPosition(2.0f,1.0f,1.0f);
 
 	m_GameObjectList.push_back(pTestObj);
+	//set main light
+
+
 
 	pCube=new CubeVisualComponent();
 	pCube->create(m_pRenderer);

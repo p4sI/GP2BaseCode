@@ -5,3 +5,5 @@
 #include "CameraComponent.h"
 #include "VisualComponent.h"
 #include "CubeVisualComponent.h"
+#include "Light.h"
+#include "DirectionalLight.h"
