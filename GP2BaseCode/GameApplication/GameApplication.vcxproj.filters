@@ -54,6 +54,9 @@
     <ClInclude Include="DirectionalLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>ModelLoading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameApplication.cpp">
@@ -76,6 +79,9 @@
     </ClCompile>
     <ClCompile Include="Transform.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>ModelLoading</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

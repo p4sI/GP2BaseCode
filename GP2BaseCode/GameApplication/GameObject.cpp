@@ -44,6 +44,7 @@ void GameObject::clearComponents()
 		if ((*iter).second)
 		{
 			delete (*iter).second;
+			(*iter).second=NULL;
 			iter=m_Components.erase(iter);
 		}
 		else

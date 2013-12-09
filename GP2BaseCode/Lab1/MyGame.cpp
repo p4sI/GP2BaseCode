@@ -55,5 +55,18 @@ bool MyGame::initGame()
 
 	m_GameObjectList.push_back(pCameraGO);
 
+	GameObject *pCar=m_ModelLoader.loadModelFromFile("Models/armoredrecon.fbx",m_pRenderer);
+	for(GameObject::ChildrenGameObjectsIter iter=pCar->getFirstChild();iter!=pCar->getLastChild();iter++)
+	{
+		pMaterial=new Material();
+		pMaterial->loadEffect("Effects/Texture.fx",m_pRenderer);
+		pMaterial->loadDiffuseTexture("Textures/armoredrecon_diff.png",m_pRenderer);
+		iter->second->addComponent(pMaterial);
+		VisualComponent *pVisual=static_cast<VisualComponent*>(iter->second->getComponent("Visual"));
+		pVisual->createVertexLayout(m_pRenderer);
+	}
+
+	m_GameObjectList.push_back(pCar);
+
 	return true;
 }
