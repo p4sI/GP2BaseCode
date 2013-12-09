@@ -222,160 +222,170 @@ void D3D10Renderer::clear(float r,float g,float b,float a)
 void D3D10Renderer::render()
 {
 	m_pD3D10Device->IASetPrimitiveTopology( D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP );
-	
 	//We should really find all lights first! but instead we are just going to set a 'main' light 
 	while(!m_RenderQueue.empty())
 	{
-		int noIndices=0;
-		int noVerts=0;
-		ID3D10Buffer *pIndexBuffer=NULL;
-		ID3D10Buffer *pVertexBuffer=NULL;
-		ID3D10Effect *pCurrentEffect=m_pDefaultEffect;
-		ID3D10EffectTechnique *pCurrentTechnique=m_pDefaultTechnique;
-		ID3D10InputLayout *pCurrentLayout=m_pDefaultVertexLayout;
-
 		GameObject * pObject=m_RenderQueue.front();
-		if(pObject)
+		for(GameObject::ChildrenGameObjectsIter iter=pObject->getFirstChild();iter!=pObject->getLastChild();iter++)
 		{
-			//Grab Transform
-			Transform transform=pObject->getTransform();
-
-			//Now grab Visual Component
-			VisualComponent *pVisualComponent=static_cast<VisualComponent *>(pObject->getComponent("Visual"));
-			if (pVisualComponent)
-			{
-				pIndexBuffer=pVisualComponent->getIndexBuffer();
-				pVertexBuffer=pVisualComponent->getVertexBuffer();
-				noVerts=pVisualComponent->getNoVerts();
-				noIndices=pVisualComponent->getNoIndices();
-
-				m_pD3D10Device->IASetIndexBuffer(pIndexBuffer,DXGI_FORMAT_R32_UINT,0);
-
-				//Get the stride(size) of the a vertex, we need this to tell the pipeline the size of one vertex - BMD
-				UINT stride = sizeof( Vertex );
-				//The offset from start of the buffer to where our vertices are located - BMD
-				UINT offset = 0;
-				//Bind the vertex buffer to input assembler stage - BMD
-				 //   http://msdn.microsoft.com/en-us/library/bb173591%28v=VS.85%29.aspx - BMD
-				m_pD3D10Device->IASetVertexBuffers( 
-					0, //The input slot to bind, zero indicates the first slot - BMD
-					1, //The number of buffers - BMD
-					&pVertexBuffer, //A pointer to an array of vertex buffers - BMD
-					&stride, //Pointer to an array of strides of vertices in the buffer - BMD
-					&offset );//Pointer to an array of offsets to the vertices in the vertex buffers - BMD
-
-				if (pVisualComponent->getVertexLayout())
-				{
-					pCurrentLayout=pVisualComponent->getVertexLayout();
-				}
-			}
-
-			m_pD3D10Device->IASetInputLayout(pCurrentLayout);
-
-
-			//Do we have an Effect? If we don't then use default
-			Material *pMaterial=static_cast<Material*>(pObject->getComponent("Material"));
-			if (pMaterial)
-			{
-				if (pMaterial->getEffect())
-				{
-					pCurrentEffect=pMaterial->getEffect();
-				}
-				if (pMaterial->getCurrentTechnique())
-				{
-					pCurrentTechnique=pMaterial->getCurrentTechnique();
-				}
-				if (pMaterial->getDiffuseTexture())
-				{
-					ID3D10EffectShaderResourceVariable * pDiffuseTextureVar=pCurrentEffect->GetVariableByName("diffuseTexture")->AsShaderResource();
-					pDiffuseTextureVar->SetResource(pMaterial->getDiffuseTexture());
-				}
-
-				if (pMaterial->getSpecularTexture())
-				{
-					ID3D10EffectShaderResourceVariable * pSpecularTextureVar=pCurrentEffect->GetVariableByName("specularTexture")->AsShaderResource();
-					pSpecularTextureVar->SetResource(pMaterial->getSpecularTexture());
-				}
-				//Retrieve & send material stuff
-				ID3D10EffectVectorVariable *pAmbientMatVar=pCurrentEffect->GetVariableByName("ambientMaterial")->AsVector();
-				ID3D10EffectVectorVariable *pDiffuseMatVar=pCurrentEffect->GetVariableByName("diffuseMaterial")->AsVector();
-				ID3D10EffectVectorVariable *pSpecularMatVar=pCurrentEffect->GetVariableByName("specularMaterial")->AsVector();
-
-				if (pAmbientMatVar)
-				{
-					pAmbientMatVar->SetFloatVector((float*)&pMaterial->getAmbient());
-				}
-				if (pDiffuseMatVar)
-				{
-					pDiffuseMatVar->SetFloatVector((float*)&pMaterial->getDiffuse());
-				}
-				if (pSpecularMatVar)
-				{
-					pSpecularMatVar->SetFloatVector((float*)&pMaterial->getSpecular());
-				}
-			}
-
-			ID3D10EffectMatrixVariable * pWorldMatrixVar=pCurrentEffect->GetVariableByName("matWorld")->AsMatrix();
-			ID3D10EffectMatrixVariable * pViewMatrixVar=pCurrentEffect->GetVariableByName("matView")->AsMatrix();
-			ID3D10EffectMatrixVariable * pProjectionMatrixVar=pCurrentEffect->GetVariableByName("matProjection")->AsMatrix();
-			ID3D10EffectVectorVariable *pAmbientLightColourVar=pCurrentEffect->GetVariableByName("ambientLightColour")->AsVector();
-
-			if (m_pMainLight)
-			{
-				DirectionalLight *pDirectionLightComponent=static_cast<DirectionalLight*>(m_pMainLight->getComponent("DirectionalLight"));
-				if (pDirectionLightComponent){
-					//ID3D10EffectVectorVariable *pDiffuseLightVar=pCurrentEffect->GetVariableByName("diffuseLightColour")->AsVector();
-					//ID3D10EffectVectorVariable *pSpecularLightVar=pCurrentEffect->GetVariableByName("specularLightColour")->AsVector();
-					ID3D10EffectVectorVariable *pLightDirVar=pCurrentEffect->GetVariableByName("lightDirection")->AsVector();
-
-					//pDiffuseLightVar->SetFloatVector((float*)&pDirectionLightComponent->getDiffuse());
-					//pSpecularLightVar->SetFloatVector((float*)&pDirectionLightComponent->getSpecular());
-					pLightDirVar->SetFloatVector((float*)&pDirectionLightComponent->getDirection());
-				}
-			}
-
-			if (m_pMainCamera)
-			{
-				Transform t=m_pMainCamera->getTransform();
-				ID3D10EffectVectorVariable *pCameraVar=pCurrentEffect->GetVariableByName("cameraPosition")->AsVector();
-				pCameraVar->SetFloatVector((float*)&t.getPosition());
-			}
-
-			if (pWorldMatrixVar)
-			{
-				pWorldMatrixVar->SetMatrix((float*)&transform.getWorld());
-			}
-			if (pViewMatrixVar)
-			{
-				pViewMatrixVar->SetMatrix((float*)&m_View);
-			}
-			if (pProjectionMatrixVar)
-			{
-				pProjectionMatrixVar->SetMatrix((float*)&m_Projection);
-			}
-			if (pAmbientLightColourVar)
-			{
-				pAmbientLightColourVar->SetFloatVector((float*)&m_AmbientLightColour);
-			}
-			D3D10_TECHNIQUE_DESC techniqueDesc;
-			pCurrentTechnique->GetDesc(&techniqueDesc); 
-
-			for (unsigned int i=0;i<techniqueDesc.Passes;++i)
-			{
-				ID3D10EffectPass *pCurrentPass=pCurrentTechnique->GetPassByIndex(i);
-				pCurrentPass->Apply(0);
-
-				if (pIndexBuffer)
-					m_pD3D10Device->DrawIndexed(noIndices,0,0);
-				else if (pVertexBuffer)
-					m_pD3D10Device->Draw(noVerts,0);
-			}
-
+			GameObject *pCurrentObject=(*iter).second;
+			render(pCurrentObject);
 		}
-
+		render(pObject);
 		m_RenderQueue.pop();
 	}
 
+}
+
+void D3D10Renderer::render(GameObject *pObject)
+{
+	m_pD3D10Device->IASetPrimitiveTopology( D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP );
+	
+	int noIndices=0;
+	int noVerts=0;
+	ID3D10Buffer *pIndexBuffer=NULL;
+	ID3D10Buffer *pVertexBuffer=NULL;
+	ID3D10Effect *pCurrentEffect=m_pDefaultEffect;
+	ID3D10EffectTechnique *pCurrentTechnique=m_pDefaultTechnique;
+	ID3D10InputLayout *pCurrentLayout=m_pDefaultVertexLayout;
+
+
+	//if(pCurrentObject)
+	//{
+		
+		//Grab Transform
+		Transform transform=pObject->getTransform();
+
+		//Now grab Visual Component
+		VisualComponent *pVisualComponent=static_cast<VisualComponent *>(pObject->getComponent("Visual"));
+		if (pVisualComponent)
+		{
+			pIndexBuffer=pVisualComponent->getIndexBuffer();
+			pVertexBuffer=pVisualComponent->getVertexBuffer();
+			noVerts=pVisualComponent->getNoVerts();
+			noIndices=pVisualComponent->getNoIndices();
+
+			m_pD3D10Device->IASetIndexBuffer(pIndexBuffer,DXGI_FORMAT_R32_UINT,0);
+
+			//Get the stride(size) of the a vertex, we need this to tell the pipeline the size of one vertex - BMD
+			UINT stride = sizeof( Vertex );
+			//The offset from start of the buffer to where our vertices are located - BMD
+			UINT offset = 0;
+			//Bind the vertex buffer to input assembler stage - BMD
+				//   http://msdn.microsoft.com/en-us/library/bb173591%28v=VS.85%29.aspx - BMD
+			m_pD3D10Device->IASetVertexBuffers( 
+				0, //The input slot to bind, zero indicates the first slot - BMD
+				1, //The number of buffers - BMD
+				&pVertexBuffer, //A pointer to an array of vertex buffers - BMD
+				&stride, //Pointer to an array of strides of vertices in the buffer - BMD
+				&offset );//Pointer to an array of offsets to the vertices in the vertex buffers - BMD
+
+			if (pVisualComponent->getVertexLayout())
+			{
+				pCurrentLayout=pVisualComponent->getVertexLayout();
+			}
+		}
+
+		m_pD3D10Device->IASetInputLayout(pCurrentLayout);
+
+
+		//Do we have an Effect? If we don't then use default
+		Material *pMaterial=static_cast<Material*>(pObject->getComponent("Material"));
+		if (pMaterial)
+		{
+			if (pMaterial->getEffect())
+			{
+				pCurrentEffect=pMaterial->getEffect();
+			}
+			if (pMaterial->getCurrentTechnique())
+			{
+				pCurrentTechnique=pMaterial->getCurrentTechnique();
+			}
+			if (pMaterial->getDiffuseTexture())
+			{
+				ID3D10EffectShaderResourceVariable * pDiffuseTextureVar=pCurrentEffect->GetVariableByName("diffuseTexture")->AsShaderResource();
+				pDiffuseTextureVar->SetResource(pMaterial->getDiffuseTexture());
+			}
+
+			if (pMaterial->getSpecularTexture())
+			{
+				ID3D10EffectShaderResourceVariable * pSpecularTextureVar=pCurrentEffect->GetVariableByName("specularTexture")->AsShaderResource();
+				pSpecularTextureVar->SetResource(pMaterial->getSpecularTexture());
+			}
+			//Retrieve & send material stuff
+			ID3D10EffectVectorVariable *pAmbientMatVar=pCurrentEffect->GetVariableByName("ambientMaterial")->AsVector();
+			ID3D10EffectVectorVariable *pDiffuseMatVar=pCurrentEffect->GetVariableByName("diffuseMaterial")->AsVector();
+			ID3D10EffectVectorVariable *pSpecularMatVar=pCurrentEffect->GetVariableByName("specularMaterial")->AsVector();
+
+			if (pAmbientMatVar)
+			{
+				pAmbientMatVar->SetFloatVector((float*)&pMaterial->getAmbient());
+			}
+			if (pDiffuseMatVar)
+			{
+				pDiffuseMatVar->SetFloatVector((float*)&pMaterial->getDiffuse());
+			}
+			if (pSpecularMatVar)
+			{
+				pSpecularMatVar->SetFloatVector((float*)&pMaterial->getSpecular());
+			}
+		}
+
+		ID3D10EffectMatrixVariable * pWorldMatrixVar=pCurrentEffect->GetVariableByName("matWorld")->AsMatrix();
+		ID3D10EffectMatrixVariable * pViewMatrixVar=pCurrentEffect->GetVariableByName("matView")->AsMatrix();
+		ID3D10EffectMatrixVariable * pProjectionMatrixVar=pCurrentEffect->GetVariableByName("matProjection")->AsMatrix();
+		ID3D10EffectVectorVariable *pAmbientLightColourVar=pCurrentEffect->GetVariableByName("ambientLightColour")->AsVector();
+
+		if (m_pMainLight)
+		{
+			DirectionalLight *pDirectionLightComponent=static_cast<DirectionalLight*>(m_pMainLight->getComponent("DirectionalLight"));
+			if (pDirectionLightComponent){
+				//ID3D10EffectVectorVariable *pDiffuseLightVar=pCurrentEffect->GetVariableByName("diffuseLightColour")->AsVector();
+				//ID3D10EffectVectorVariable *pSpecularLightVar=pCurrentEffect->GetVariableByName("specularLightColour")->AsVector();
+				ID3D10EffectVectorVariable *pLightDirVar=pCurrentEffect->GetVariableByName("lightDirection")->AsVector();
+
+				//pDiffuseLightVar->SetFloatVector((float*)&pDirectionLightComponent->getDiffuse());
+				//pSpecularLightVar->SetFloatVector((float*)&pDirectionLightComponent->getSpecular());
+				pLightDirVar->SetFloatVector((float*)&pDirectionLightComponent->getDirection());
+			}
+		}
+
+		if (m_pMainCamera)
+		{
+			Transform t=m_pMainCamera->getTransform();
+			ID3D10EffectVectorVariable *pCameraVar=pCurrentEffect->GetVariableByName("cameraPosition")->AsVector();
+			pCameraVar->SetFloatVector((float*)&t.getPosition());
+		}
+
+		if (pWorldMatrixVar)
+		{
+			pWorldMatrixVar->SetMatrix((float*)&transform.getWorld());
+		}
+		if (pViewMatrixVar)
+		{
+			pViewMatrixVar->SetMatrix((float*)&m_View);
+		}
+		if (pProjectionMatrixVar)
+		{
+			pProjectionMatrixVar->SetMatrix((float*)&m_Projection);
+		}
+		if (pAmbientLightColourVar)
+		{
+			pAmbientLightColourVar->SetFloatVector((float*)&m_AmbientLightColour);
+		}
+		D3D10_TECHNIQUE_DESC techniqueDesc;
+		pCurrentTechnique->GetDesc(&techniqueDesc); 
+
+		for (unsigned int i=0;i<techniqueDesc.Passes;++i)
+		{
+			ID3D10EffectPass *pCurrentPass=pCurrentTechnique->GetPassByIndex(i);
+			pCurrentPass->Apply(0);
+
+			if (pIndexBuffer)
+				m_pD3D10Device->DrawIndexed(noIndices,0,0);
+			else if (pVertexBuffer)
+				m_pD3D10Device->Draw(noVerts,0);
+		}
 }
 
 void D3D10Renderer::present()

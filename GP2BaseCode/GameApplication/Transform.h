@@ -2,6 +2,7 @@
 
 #include "GameComponent.h"
 
+
 #include <windows.h>
 #define _XM_NO_INTRINSICS_
 #include <xnamath.h>
@@ -25,15 +26,7 @@ public:
 	{
 	};
 
-	void update()
-	{
-		m_matScale=XMMatrixScaling(m_vecScale.x,m_vecScale.y,m_vecScale.z);
-		m_matRotation=XMMatrixRotationRollPitchYaw(m_vecRotation.x,m_vecRotation.y,m_vecRotation.z);
-		m_matTranslation=XMMatrixTranslation(m_vecPosition.x,m_vecPosition.y,m_vecPosition.z);
-
-		m_matWorld=XMMatrixMultiply(m_matScale,m_matRotation);
-		m_matWorld=XMMatrixMultiply(m_matWorld,m_matTranslation);
-	};
+	void update();
 
 	void setScale(float x,float y,float z)
 	{

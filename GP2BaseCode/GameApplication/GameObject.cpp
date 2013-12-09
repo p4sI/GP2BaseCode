@@ -17,6 +17,25 @@ void GameObject::addComponent(GameComponent* pComponent)
 	
 }
 
+void GameObject::clearChildren()
+{
+	ChildrenGameObjectsIter iter=m_Children.begin();
+	while(iter!=m_Children.end())
+	{
+		if ((*iter).second)
+		{
+			delete (*iter).second;
+			iter=m_Children.erase(iter);
+		}
+		else
+		{
+			iter++;
+		}
+	}
+
+	m_Children.clear();
+}
+
 void GameObject::clearComponents()
 {
 	ComponentTableIter iter=m_Components.begin();
@@ -46,5 +65,27 @@ void GameObject::update()
 		{
 			pCurrentComponent->update();
 		}
+	}
+	for(ChildrenGameObjectsIter iter=m_Children.begin();iter!=m_Children.end();iter++)
+	{
+		GameObject *pCurrentChild=(*iter).second;
+		if (pCurrentChild)
+		{
+			pCurrentChild->update();
+		}
+	}
+}
+
+void GameObject::addChild(GameObject *pChild)
+{
+	const string name=pChild->getName();
+	if (m_Children.find(name)==m_Children.end())
+	{
+		pChild->setParent(this);
+		m_Children[name]=pChild;
+	}
+	else
+	{
+		//do nothing!
 	}
 }
